@@ -1,0 +1,45 @@
+import library.*
+
+buildscript {
+    ext {
+        kotlin_version = '1.6.21'
+    }
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+    dependencies {
+        classpath Libs.AndroidGradlePlugin
+        classpath Libs.MavenGradlePlugin
+        classpath Libs.MoshGradlePlugin
+        classpath Libs.NavigationGradlePlugin
+        classpath Libs.Kotlin.gradlePlugin
+        classpath Libs.Dagger.plugin
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+allprojects {
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+        kotlinOptions {
+            freeCompilerArgs += [
+                    "-opt-in=kotlin.ExperimentalUnsignedTypes",
+                    "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+                    "-opt-in=kotlinx.coroutines.InternalCoroutinesApi",
+                    "-opt-in=androidx.compose.animation.ExperimentalAnimationApi",
+                    "-opt-in=androidx.compose.ExperimentalComposeApi",
+                    "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
+                    "-opt-in=androidx.compose.runtime.ExperimentalComposeApi",
+                    "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi",
+                    "-opt-in=coil.annotation.ExperimentalCoilApi",
+                    "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
+                    "-opt-in=com.google.accompanist.pager.ExperimentalPagerApi",
+                    "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
+                    "-opt-in=androidx.constraintlayout.compose.ExperimentalMotionApi",
+            ]
+        }
+    }
+}
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

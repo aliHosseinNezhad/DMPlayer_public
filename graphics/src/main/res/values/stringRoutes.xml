@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="permission">Permission</string>
+    <string name="main">Main</string>
+    <string name="artists">Artists</string>
+    <string name="tracks">Tracks</string>
+    <string name="queues">Queues</string>
+    <string name="tracks_by_favorite">Tracks By Favorite</string>
+    <string name="tracks_by_album">Tracks By Album</string>
+    <string name="tracks_by_artist">Track By Artist</string>
+    <string name="tracks_by_queue">Track By Queue</string>
+    <string name="tracks_by_search">Track By Search</string>
+</resources>

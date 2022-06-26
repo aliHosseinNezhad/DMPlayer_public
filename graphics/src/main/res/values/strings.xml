@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE resources [<!ENTITY appname "DMPlayer">]>
+<resources>
+    <string name="app_name">&appname;</string>
+    <string name="play">play</string>
+    <string name="pause">pause</string>
+    <string name="share">Share</string>
+    <string name="menu_open_with">Open With</string>
+    <string name="menu_remove_from_queue">Remove From Queue</string>
+    <string name="menu_share">share</string>
+    <string name="menu_add_to">Add To</string>
+    <string name="add_to">add to</string>
+    <string name="remove">Remove</string>
+    <string name="remove_lowercase">Remove</string>
+    <string name="create_queue">Create Queue</string>
+    <string name="create">Create</string>
+    <string name="title">title</string>
+    <string name="title_uppercase">Title</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">delete</string>
+    <string name="remove_music_from_queue_dialog">Are you Sure to remove Music From Queue?</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="sort_by">sort by</string>
+    <string name="remove_track">Remove Track</string>
+    <string name="accept">Accept</string>
+    <string name="remove_queue_dialog">Are you sure to remove this queue?</string>
+    <string name="clear_queue_dialog">Are you sure to clear queue?</string>
+    <string name="notification_channel_name">music player</string>
+    <string name="notification_channel_description">description</string>
+
+    <string name="access_media_store_title">Media Access Permission</string>
+    <string name="access_media_store_message">&appname; needs to access media files in order to play musics.</string>
+    <string name="clear">Clear</string>
+
+
+    <string name="edit_queue_title">Edit Queue</string>
+    <string name="edit_queue_label">Title</string>
+    <string name="edit_queue_accept">Edit</string>
+    <string name="edit_queue_cancel">Cancel</string>
+    <string name="queue_create_title">Create Queue</string>
+    <string name="queue_create_label">Title</string>
+    <string name="queue_create_accept">Create</string>
+    <string name="queue_create_cancel">Cancel</string>
+    <string name="queue_remove_title">Remove Queue</string>
+    <string name="queue_clear">Clear Queue</string>
+    <string name="track_remove_accept">Remove</string>
+    <string name="track_remove_cancel">Cancel</string>
+    <string name="track_remove_dialog">Are you sure to remove this Track?</string>
+    <string name="tracks_remove_dialog">Are you sure to remove %d Tracks?</string>
+    <string name="track_remove_from_queue">Remove Track From Queue</string>
+    <string name="track_remove_from_queue_dialog">Are you sure to remove this Track From Queue?</string>
+    <string name="dislike">Dislike</string>
+    <string name="track_details">Track Details</string>
+    <string name="favorite">Favorite</string>
+    <string name="albums">Albums</string>
+    <string name="search">search</string>
+    <string name="empty_list">List is empty</string>
+</resources>

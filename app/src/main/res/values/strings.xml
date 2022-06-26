@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <string name="albums_by_search">Album By Search</string>
+    <string name="artists_by_search">Artists By Search</string>
+    <string name="view_all">View All</string>
+    <string name="duration">Duration</string>
+    <string name="duration_lowercase">duration</string>
+    <string name="edit_track">Edit</string>
+    <string name="empty_albums">There is no albums</string>
+    <string name="empty_artist">There is no artists</string>
+    <string name="empty_track">There is no tracks</string>
+    <string name="playlist">PlayLists</string>
+    <string name="search_dialog">"Search "</string>
+</resources>

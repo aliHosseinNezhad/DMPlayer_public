@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/music_nav"
+    app:startDestination="@id/categoryFragment">
+
+    <fragment
+        android:id="@+id/categoryFragment"
+        android:name="com.gamapp.dmplayer.presenter.fragments.CategoryFragment"
+        android:label="CategoryFragment" >
+        <action
+            android:id="@+id/action_categoryFragment_to_favoriteTracks"
+            app:destination="@id/favoriteTracks"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+        <action
+            android:id="@+id/action_categoryFragment_to_trackByAlbumFragment"
+            app:destination="@id/trackByAlbumFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
+        </action>
+        <action
+            android:id="@+id/action_categoryFragment_to_trackByArtistFragment"
+            app:destination="@id/trackByArtistFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+        <action
+            android:id="@+id/action_categoryFragment_to_trackByQueueFragment"
+            app:destination="@id/trackByQueueFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+        <action
+            android:id="@+id/action_categoryFragment_to_trackBySearchFragment"
+            app:destination="@id/trackBySearchFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+        <action
+            android:id="@+id/action_categoryFragment_to_albumBySearchFragment"
+            app:destination="@id/albumBySearchFragment" />
+        <action
+            android:id="@+id/action_categoryFragment_to_artistBySearchFragment"
+            app:destination="@id/artistBySearchFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/favoriteTracks"
+        android:name="com.gamapp.dmplayer.presenter.fragments.TracksByFavorite"
+        android:label="FavoriteTracks" />
+    <fragment
+        android:id="@+id/trackByAlbumFragment"
+        android:name="com.gamapp.dmplayer.presenter.fragments.TrackByAlbumFragment"
+        android:label="TrackByAlbumFragment">
+    </fragment>
+    <fragment
+        android:id="@+id/trackByArtistFragment"
+        android:name="com.gamapp.dmplayer.presenter.fragments.TrackByArtistFragment"
+        android:label="TrackByArtistFragment" />
+    <fragment
+        android:id="@+id/trackByQueueFragment"
+        android:name="com.gamapp.dmplayer.presenter.fragments.TrackByQueueFragment"
+        android:label="TrackByQueueFragment" />
+    <fragment
+        android:id="@+id/trackBySearchFragment"
+        android:name="com.gamapp.dmplayer.presenter.fragments.TrackBySearchFragment"
+        android:label="TrackBySearchFragment" />
+    <fragment
+        android:id="@+id/albumBySearchFragment"
+        android:name="com.gamapp.dmplayer.presenter.fragments.AlbumBySearchFragment"
+        android:label="AlbumBySearchFragment" >
+        <action
+            android:id="@+id/action_albumBySearchFragment_to_trackByAlbumFragment"
+            app:destination="@id/trackByAlbumFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/artistBySearchFragment"
+        android:name="com.gamapp.dmplayer.presenter.fragments.ArtistBySearchFragment"
+        android:label="ArtistBySearchFragment" >
+        <action
+            android:id="@+id/action_artistBySearchFragment_to_trackByArtistFragment"
+            app:destination="@id/trackByArtistFragment" />
+    </fragment>
+</navigation>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:orientation="horizontal"
+    tools:background="@color/ic_launcher_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:src="@drawable/ic_track"
+            app:tint="@color/white" />
+
+        <ImageView
+            android:id="@+id/back_music_btn"
+            style="@style/music_notification_buttons"
+            android:src="@drawable/round_fast_rewind_24" />
+        <FrameLayout
+            android:layout_width="8dp"
+            android:layout_height="0dp"/>
+        <ImageView
+            android:id="@+id/play_pause_btn"
+            style="@style/music_notification_buttons"
+            android:src="@drawable/round_play_arrow_24" />
+        <FrameLayout
+            android:layout_width="8dp"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:id="@+id/next_music_btn"
+            style="@style/music_notification_buttons"
+            android:src="@drawable/round_fast_forward_24" />
+
+        <FrameLayout
+            android:layout_width="8dp"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:id="@+id/exit_music_player"
+            style="@style/music_notification_buttons"
+            android:src="@drawable/round_clear_24" />
+
+        <FrameLayout
+            android:layout_width="8dp"
+            android:layout_height="0dp" />
+    </LinearLayout>
+</FrameLayout>
