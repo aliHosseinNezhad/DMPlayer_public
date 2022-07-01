@@ -42,18 +42,16 @@ fun <T : ImagedItemModel> topBarType(
 }
 
 
-@Composable
-inline fun <T : ImagedItemModel> BaseVerticalTitledList(
+@Composable fun <T : ImagedItemModel> BaseVerticalTitledList(
     title: String,
     items: List<T>,
     state: BaseListState<T>,
     modifier: Modifier,
     popupList: List<Pair<String, (T) -> Unit>> = emptyList(),
     onEmptyListImage: @Composable BoxScope.() -> Unit,
-    noinline isFocused: @Composable (T) -> Boolean = { false },
-    noinline onItemClicked: (T) -> Unit,
-    other: @Composable BoxScope.() -> Unit,
-    noinline popBack: () -> Unit
+    onItemClicked: (T) -> Unit,
+    other:  @Composable BoxScope.() -> Unit,
+    popBack: () -> Unit
 ) {
     val topBarType by topBarType(items = items, selectionManager = state.selectionManager)
     val showOne = remember {
@@ -93,7 +91,6 @@ inline fun <T : ImagedItemModel> BaseVerticalTitledList(
                 .clip(shape = RoundedCornerShape(25.dp))
                 .background(MaterialTheme.colors.surface),
             onItemClicked = onItemClicked,
-            isFocused = isFocused,
             popupList = popupList,
             other = other,
             emptyContent = onEmptyListImage,

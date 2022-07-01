@@ -88,17 +88,19 @@ class BaseItem {
 }
 
 @Composable
-fun VerticalListItem(
+fun <T : ImagedItemModel> LinearItem(
     modifier: Modifier,
-    item: BaseItem,
+    item: T,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
+    isFocused: State<Boolean>,
+    isSelected: State<Boolean>,
     showPopupMenu: MutableState<Boolean> = rememberState { false },
-//    popupContent: @Composable (MutableState<Boolean>) -> Unit = {},
+    popupContent: @Composable (MutableState<Boolean>) -> Unit = {},
     onSelection: Boolean,
 ) {
-//    val focused = isFocused(item)
-//    val selected = isSelected(item)
+    val selected by isSelected
+    val focused by isFocused
     val clickGestureModifier = Modifier.combinedClickable(
         interactionSource = remember {
             MutableInteractionSource()
@@ -115,26 +117,21 @@ fun VerticalListItem(
             .fillMaxWidth()
             .height(80.dp)
     ) {
-//        if (onSelection) {
-//            val background = if (selected)
-//                primary.copy(0.3f) else Color.Transparent
-//            Spacer(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .background(background)
-//            )
-//        }
+        if (onSelection) {
+            val background = if (selected)
+                primary.copy(0.3f) else Color.Transparent
+            Spacer(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(background)
+            )
+        }
         Row(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            Image(
-                item = item, modifier = Modifier
-                    .align(CenterVertically)
-                    .size(50.dp)
-            )
-//            ItemImage(item.imageId.value, defaultImage = item.defaultImage.value)
+            ItemImage(item.imageId, defaultImage = item.defaultImage)
             Spacer(modifier = Modifier.width(16.dp))
             Column(
                 modifier = Modifier
@@ -147,13 +144,15 @@ fun VerticalListItem(
                         .weight(1f)
                 ) {
                     DetailText(
-                        baseItem = item
+                        title = item.title,
+                        subtitle = item.subtitle,
+                        isSelected = focused
                     )
                     Spacer(modifier = Modifier.padding(8.dp))
-//                    if (!onSelection)
-//                        MoreVert(show = showPopupMenu) {
-//                            popupContent(showPopupMenu)
-//                        }
+                    if (!onSelection)
+                        MoreVert(show = showPopupMenu) {
+                            popupContent(showPopupMenu)
+                        }
                     Spacer(modifier = Modifier.width(4.dp))
                 }
                 Divider(
@@ -299,42 +298,7 @@ fun RowScope.DetailText(title: String, subtitle: String, isSelected: Boolean = f
 
 
 @Composable
-fun RowScope.DetailText(baseItem: BaseItem): Unit {
-//    val color =
-//        if (isSelected) MaterialTheme.colors.primary else LocalContentColor.current
-    Column(
-        modifier = Modifier
-            .fillMaxHeight()
-            .weight(1f),
-        verticalArrangement = Arrangement.Center
-    ) {
-        com.gamapp.AndroidText(
-            text = baseItem.title,
-            textAlign = TextAlign.Start,
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(max = 30.dp)
-                .align(Alignment.Start),
-            color = MaterialTheme.colors.onSurface,
-            fontSize = 17.sp,
-            maxLines = 1
-        )
-        com.gamapp.AndroidText(
-            text = baseItem.subtitle,
-            textAlign = TextAlign.Start,
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(max = 30.dp),
-            color = MaterialTheme.colors.onSurface.copy(0.6f),
-            fontSize = 12.sp,
-            maxLines = 1
-        )
-        Spacer(modifier = Modifier.padding(4.dp))
-    }
-}
-
-@Composable
-inline fun RowScope.MoreVert(
+fun RowScope.MoreVert(
     show: MutableState<Boolean>,
     popupContent: @Composable () -> Unit,
 ) {

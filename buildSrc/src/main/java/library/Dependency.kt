@@ -2,9 +2,10 @@ package library
 
 object Versions {
     const val hilt = "1.0.0"
-    const val compose = "1.2.0-rc02"
+    const val compose = "1.2.0-rc03"
+    const val composeCompiler = "1.2.0"
     const val room = "2.4.2"
-    const val kotlin = "1.6.21"
+    const val kotlin = "1.7.0"
     const val gradlePlugin = "7.0.4"
     const val coroutine = "1.6.1"
     const val dagger = "2.38.1"

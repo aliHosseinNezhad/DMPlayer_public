@@ -1,9 +1,7 @@
 package com.gamapp.dmplayer.presenter.ui.screen.popup_menu_layout
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -25,14 +23,21 @@ import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import com.gamapp.dmplayer.presenter.ui.theme.popupColor
 import com.gamapp.layout.PopupLayout
-
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun TextPopupMenu(
+fun Popup(
     show: Boolean,
-    onDismiss: () -> Unit,
-    popupList: List<Pair<String, () -> Unit>>,
+    onDismissRequest: () -> Unit,
+    animationSpec: FiniteAnimationSpec<Float> = spring(),
+    popupProperties: PopupProperties = remember {
+        PopupProperties(focusable = true)
+    },
+    content: @Composable (value: State<Float>) -> Unit
 ) {
+    val currentShow = rememberUpdatedState(newValue = show)
+    val currentAnimationSpec by rememberUpdatedState(newValue = animationSpec)
     val popupPositionProvider = remember {
         object : PopupPositionProvider {
             override fun calculatePosition(
@@ -47,69 +52,89 @@ fun TextPopupMenu(
             }
         }
     }
-    val properties = remember {
-        PopupProperties(focusable = true)
+    val animator = remember {
+        Animatable(if (currentShow.value) 1f else 0f)
     }
-    val animation = updateTransition(targetState = show, label = null).animateFloat(
-        label = "",
-        transitionSpec = {
-            tween(400)
-        }) {
-        if (it) 1f else 0f
-    }
-    val showPopup by remember {
-        derivedStateOf {
-            animation.value != 0f
+    LaunchedEffect(key1 = Unit) {
+        snapshotFlow { currentShow.value }.collectLatest { show ->
+            val target = if (show) 1f else 0f
+            if (show) {
+                delay(50)
+            }
+            animator.animateTo(targetValue = target, animationSpec = currentAnimationSpec)
         }
     }
-    if (showPopup)
+    val showContent by remember {
+        derivedStateOf {
+            animator.value != 0f || currentShow.value
+        }
+    }
+    val animationValue = remember {
+        derivedStateOf {
+            animator.value
+        }
+    }
+    if (showContent)
         Popup(
             popupPositionProvider = popupPositionProvider,
-            onDismissRequest = onDismiss,
-            properties = properties
+            properties = popupProperties,
+            onDismissRequest = onDismissRequest,
         ) {
-            val background = MaterialTheme.colors.popupColor
-            PopupLayout(
-                modifier = Modifier
-                    .widthIn(100.dp)
-                    .wrapContentHeight()
-                    .graphicsLayer {
-                        val scale = 1f * (animation.value) + 0.8f * (1 - animation.value)
-                        scaleX = scale
-                        scaleY = scale
-                        alpha = animation.value
-                        shadowElevation = 3.dp.toPx()
-                        clip = true
-                        shape = RoundedCornerShape(25.dp)
-                    }
-                    .background(background)
+            content(animationValue)
+        }
+}
+@Composable
+fun TextPopupMenu(
+    show: Boolean,
+    onDismiss: () -> Unit,
+    popupList: List<Pair<String, () -> Unit>>,
+) {
+    Popup(
+        show = show,
+        onDismissRequest = onDismiss,
+    ) { animation ->
+        val background = MaterialTheme.colors.popupColor
+        PopupLayout(
+            modifier = Modifier
+                .widthIn(100.dp)
+                .wrapContentHeight()
+                .graphicsLayer {
+                    val scale = 1f * (animation.value) + 0.8f * (1 - animation.value)
+                    scaleX = scale
+                    scaleY = scale
+                    alpha = animation.value
+                    shadowElevation = 3.dp.toPx()
+                    clip = true
+                    shape = RoundedCornerShape(25.dp)
+                }
+                .background(background)
+        ) {
+            CompositionLocalProvider(
+                LocalContentColor provides contentColorFor(
+                    backgroundColor = MaterialTheme.colors.surface
+                )
             ) {
-                CompositionLocalProvider(
-                    LocalContentColor provides contentColorFor(
-                        backgroundColor = MaterialTheme.colors.surface
+                popupList.forEach {
+                    Text(
+                        text = it.first, modifier = Modifier
+                            .clickable(interactionSource = remember {
+                                MutableInteractionSource()
+                            }, indication = rememberRipple(), onClick = {
+                                it.second()
+                                onDismiss()
+                            })
+                            .padding(horizontal = 16.dp)
+                            .height(50.dp)
+                            .wrapContentHeight(align = Alignment.CenterVertically)
+                            .wrapContentWidth(align = Alignment.Start),
+                        textAlign = TextAlign.Center,
+                        color = LocalContentColor.current
                     )
-                ) {
-                    popupList.forEach {
-                        Text(
-                            text = it.first, modifier = Modifier
-                                .clickable(interactionSource = remember {
-                                    MutableInteractionSource()
-                                }, indication = rememberRipple(), onClick = {
-                                    it.second()
-                                    onDismiss()
-                                })
-                                .padding(horizontal = 16.dp)
-                                .height(50.dp)
-                                .wrapContentHeight(align = Alignment.CenterVertically)
-                                .wrapContentWidth(align = Alignment.Start),
-                            textAlign = TextAlign.Center,
-                            color = LocalContentColor.current
-                        )
-                    }
                 }
             }
-            BackHandler {
-                onDismiss()
-            }
         }
+        BackHandler {
+            onDismiss()
+        }
+    }
 }

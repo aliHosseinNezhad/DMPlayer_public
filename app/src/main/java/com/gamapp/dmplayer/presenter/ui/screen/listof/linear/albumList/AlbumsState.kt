@@ -40,4 +40,9 @@ class AlbumsState(val context: Context) : BaseListState<AlbumModel>() {
             )
         }
     }
+
+    @Composable
+    override fun isItemFocused(item: AlbumModel): Boolean {
+        return false
+    }
 }

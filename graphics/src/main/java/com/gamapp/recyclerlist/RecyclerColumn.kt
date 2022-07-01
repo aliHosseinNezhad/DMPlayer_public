@@ -23,27 +23,26 @@ class Item(
 
     var placeable: Placeable? = null
 }
-
-@Preview
-@Composable
-fun RecyclerColumnPreview() {
-    RecyclerColumn(count = 10, content = { text ->
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-                .height(50.dp)
-                .scrollable(
-                    state = rememberScrollableState { it },
-                    overscrollEffect = null,
-                    orientation = Orientation.Vertical
-                )
-        ) {
-            Text(text = text.value.toString())
-        }
-    })
-
-}
+//
+//@Preview
+//@Composable
+//fun RecyclerColumnPreview() {
+//    RecyclerColumn(count = 10, content = { text ->
+//        Box(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(vertical = 8.dp)
+//                .height(50.dp)
+//                .scrollable(
+//                    state = rememberScrollableState { it },
+//                    orientation = Orientation.Vertical
+//                )
+//        ) {
+//            Text(text = text.value.toString())
+//        }
+//    })
+//
+//}
 
 
 @Composable

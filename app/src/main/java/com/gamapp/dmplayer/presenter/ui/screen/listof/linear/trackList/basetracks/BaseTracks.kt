@@ -21,8 +21,6 @@ fun BaseTracks(
 ) {
     val scope = rememberCoroutineScope()
     val viewModel = hiltViewModel<AppViewModel>()
-    val playerViewModel = hiltViewModel<PlayerViewModel>()
-    val currentTrackId = playerViewModel.currentTrack.collectAsState().value?.id
     BaseList(
         state = state,
         items = items,
@@ -30,9 +28,6 @@ fun BaseTracks(
         other = {
             with(state) { FloatingButton() }
             TrackSelectionButtons(state.selectionManager)
-        },
-        isFocused = {
-            currentTrackId == it.id
         },
         popupList = popups,
         onItemClicked = { item ->

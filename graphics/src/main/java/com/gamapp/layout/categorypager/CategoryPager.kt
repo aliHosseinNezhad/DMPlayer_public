@@ -33,13 +33,19 @@ class Runner {
 }
 
 sealed class Progress {
-    object Empty : Progress() {
+    class Fixed(val index: Int? = null, val requesterId: Any? = null) : Progress() {
         override fun toString(): String {
             return "Empty"
         }
     }
 
-    class Data(val from: Int, val to: Int, val value: Float, val requesterId: Any? = null) :
+    class Data(
+        val from: Int,
+        val to: Int,
+        val value: Float,
+        val totolValue: Float,
+        val requesterId: Any? = null
+    ) :
         Progress() {
         override fun toString(): String {
             return "Progress(from:$from , to:$to , value:$value , requesterId:$requesterId)"
@@ -54,8 +60,8 @@ class Index(val index: Int, val requesterId: Any?) {
     }
 }
 
-fun progress(from: Int, to: Int, value: Float, requesterId: Any?): Progress {
-    return Progress.Data(from, to, value, requesterId)
+fun progress(from: Int, to: Int, value: Float, totalValue: Float, requesterId: Any?): Progress {
+    return Progress.Data(from, to, value, totalValue, requesterId)
 }
 
 @Composable
@@ -85,7 +91,7 @@ class CategoryPagerState(initialIndex: Index) {
     internal var max = 0f
     private val defaultAnimationSpec = tween<Float>(350)
     internal var scroll by mutableStateOf(0f)
-    private val _progress = mutableStateOf<Progress>(Progress.Empty)
+    private val _progress = mutableStateOf<Progress>(Progress.Fixed())
     val progress: State<Progress> = _progress
     private val _currentIndexState = mutableStateOf(initialIndex)
     val currentIndexState: State<Index> = _currentIndexState
@@ -128,11 +134,13 @@ class CategoryPagerState(initialIndex: Index) {
             )
             val count = abs(target - currentIndex).coerceAtLeast(1)
             val value = dif / (size.width * count)
+            val percent = ((scroll - min) / (max - min)).coerceIn(0f, 1f)
             _progress.value = progress(
                 from = currentIndex,
                 to = target,
                 value = value,
-                requesterId = requestId
+                requesterId = requestId,
+                totalValue = percent
             )
         }
         return consumed
@@ -193,8 +201,8 @@ class CategoryPagerState(initialIndex: Index) {
                     scrollByInternal(delta, targetIndex = index, requestId = requesterId)
                     pv = value
                 }
+            _progress.value = Progress.Fixed(index = index, requesterId = requesterId)
             _currentIndexState.value = (Index(index, requesterId = requesterId))
-            _progress.value = Progress.Empty
         }
     }
 
@@ -234,7 +242,7 @@ class CategoryPagerState(initialIndex: Index) {
     }
 
     fun checkWithProgress(it: Progress) {
-        internalEnabled = it is Progress.Empty
+        internalEnabled = it is Progress.Fixed
     }
 
 
@@ -302,8 +310,7 @@ fun CategoryPager(
                         IgnorePointerDraggableState(state.dragState)
                     }
                 },
-            )
-        ,
+            ),
         content = content
     )
 }

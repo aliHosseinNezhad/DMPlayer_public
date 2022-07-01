@@ -15,8 +15,5 @@ fun ArtistList(artists: List<ArtistModel>, modifier: Modifier, navigator: (Artis
             navigator(it)
         },
         state = state,
-        isFocused = {
-            false
-        }
     )
 }

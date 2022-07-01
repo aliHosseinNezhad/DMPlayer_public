@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gamapp.custom.CustomIconButton
 import com.gamapp.dmplayer.R
 import com.gamapp.dmplayer.presenter.ui.screen.elements.sort_elements.TrackSortLayout
@@ -30,6 +31,7 @@ import com.gamapp.dmplayer.presenter.ui.screen.listof.linear.SortBarVisibility
 import com.gamapp.dmplayer.presenter.ui.screen.player.PlayerHeight
 import com.gamapp.dmplayer.presenter.ui.theme.primary
 import com.gamapp.dmplayer.presenter.viewmodel.AppViewModel
+import com.gamapp.dmplayer.presenter.viewmodel.musicplayer.PlayerViewModel
 import com.gamapp.domain.models.TrackModel
 import com.gamapp.domain.sealedclasses.Sort
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -146,5 +148,11 @@ class BaseTrackState(private val viewModel: AppViewModel) :
                     }
                 })
         }
+    }
+
+    @Composable
+    override fun isItemFocused(item: TrackModel): Boolean {
+        val currentTrack = viewModel.currentTrack.collectAsState()
+        return item.id == currentTrack.value?.id
     }
 }

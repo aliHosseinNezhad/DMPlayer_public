@@ -12,7 +12,6 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasurePolicy
@@ -81,7 +80,7 @@ class CategoryTitlePagerState(
     internal val items = mutableMapOf<Any?, IntSize>()
     private val _currentIndexState = mutableStateOf(initialIndex)
     val currentIndexState: State<Index> = _currentIndexState
-    private val _progress = mutableStateOf<Progress>(Progress.Empty)
+    private val _progress = mutableStateOf<Progress>(Progress.Fixed())
     val progress: State<Progress> = _progress
 
 
@@ -109,12 +108,19 @@ class CategoryTitlePagerState(
             val targetOffset = positionOfIndex(target)
             val bound = abs(targetOffset - offset).coerceAtLeast(1)
             val value = dif / (bound)
+
+
+            val totalValue = ((scroll - min) / (max - min)).coerceIn(0f, 1f)
+
             _progress.value = progress(
                 from = currentIndex,
                 to = target,
                 value = value,
+                totalValue = totalValue,
                 requesterId = requesterId
             )
+
+
         }
         return consumed
     }
@@ -137,7 +143,7 @@ class CategoryTitlePagerState(
     }
 
     private fun Progress.check(startKey: List<Any?>): Boolean {
-        if (this == Progress.Empty) return false
+        if (this is Progress.Fixed) return false
         this as Progress.Data
         if (this.requesterId == this@CategoryTitlePagerState) return false
         if (this.requesterId in startKey) return false
@@ -151,32 +157,44 @@ class CategoryTitlePagerState(
     }
 
     private val progressTemp = mutableMapOf<Pair<Int, Int>, Pair<Int, Int>>()
-    fun moveWithProgress(progress: Progress, ignoredKeys: List<Any?> = listOf()) {
-        internalEnabled = progress is Progress.Empty
-        if (progress.check(ignoredKeys)) {
-            progress as Progress.Data
-            val from = progress.from
-            val to = progress.to
-            val value = abs(progress.value)
-            if (from == to) {
-                val to2 = progressTemp.keys.firstOrNull {
-                    it.first == from
-                } ?: return
-                val bounds = progressTemp[to2] ?: return
-                val df = bounds.second - bounds.first
-                val v = value * df
-                scrollTo(bounds.first + v)
-            } else {
-                val bounds = progressTemp.getOrPut(from to to) {
-                    val s = positionOfIndex(from)
-                    val e = positionOfIndex(to)
-                    s to e
-                }
-                val df = bounds.second - bounds.first
-                val v = value * df
-                scrollTo(bounds.first + v)
+
+    private fun getEachItemPosition(): List<Float> {
+        return buildList {
+            if (items.isNotEmpty()) {
+                val items = items.mapNotNull { it.value }
+                var w = -items.first().width / 2f
+                var i = 0
+                do {
+                    w += items[i].width / 2
+                    add(w)
+                    w += items[i].width / 2
+                    i++
+                } while ((i in items.indices))
             }
+        }
+    }
+
+    fun moveWithProgress(progress: Progress, ignoredKeys: List<Any?> = listOf()) {
+        internalEnabled = progress is Progress.Fixed
+        if (progress is Progress.Data && progress.check(ignoredKeys)) {
+            val value = progress.totolValue.coerceIn(0f, 1f)
+            if (items.size <= 1) return
+            val index = (value * (items.size - 1)).coerceIn(0f, (items.size - 1).toFloat())
+            val positions = getEachItemPosition()
+            val i = index.toInt()
+            val di = index - i
+            val s = positions[i] + if (i < items.size - 1) {
+                (positions[i + 1] - positions[i]) * di
+            } else 0f
+            scrollTo(s)
         } else {
+            if (progress is Progress.Fixed && progress.requesterId !in ignoredKeys) {
+                Log.i(TAG, "moveWithProgress: i called with ${progress.index}")
+                progress.index?.let { index ->
+                    val positions = getEachItemPosition()
+                    scrollTo(positions[index])
+                }
+            }
             progressTemp.clear()
         }
     }
@@ -234,18 +252,17 @@ class CategoryTitlePagerState(
     private suspend fun goto(targetOffset: Int, index: Int, requesterId: Any?) {
         coroutineScope {
             _currentIndexState.value = Index(index, requesterId)
-            var pv = scroll.toFloat()
+            var pv = scroll
             if (scroll != targetOffset.toFloat())
                 Animatable(scroll).animateTo(
                     targetValue = targetOffset.toFloat(),
                     animationSpec = tween(400)
                 ) {
-//                    scroll = value
                     val delta = value - pv
                     scrollBy(delta, targetIndex = index, requesterId = requesterId)
                     pv = value
                 }
-            _progress.value = Progress.Empty
+            _progress.value = Progress.Fixed(index = index, requesterId = requesterId)
         }
 
     }

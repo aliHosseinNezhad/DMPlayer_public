@@ -20,8 +20,5 @@ fun BaseAlbums(
             navigator(it)
         },
         state = state,
-        isFocused = {
-            false
-        }
     )
 }

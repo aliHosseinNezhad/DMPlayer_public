@@ -27,8 +27,6 @@ fun CategoryTracks(
 ) {
     val scope = rememberCoroutineScope()
     val viewModel = hiltViewModel<AppViewModel>()
-    val playerViewModel = hiltViewModel<PlayerViewModel>()
-    val id = playerViewModel.currentTrack.collectAsState().value?.id
     BaseVerticalTitledList(
         title = categoryTitle,
         items = tracks,
@@ -47,9 +45,6 @@ fun CategoryTracks(
             TrackSelectionButtons(state.selectionManager)
         },
         popupList = popups,
-        isFocused = {
-            id == it.id
-        },
         popBack = popBack
     )
 }

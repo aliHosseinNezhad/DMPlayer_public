@@ -32,20 +32,23 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun MainCategoryPage(
-    nav: NavHostController,
-    trackViewModel: TracksViewModel,
-    categoryViewModel: CategoryViewModel,
-    queueViewModel: QueueViewModel
-) {
-    val onSearch = rememberSaveable {
-        mutableStateOf(false)
-    }
+fun PagerConnections(categoryPagerState: CategoryPagerState, categoryTitlePagerState: CategoryTitlePagerState): State<TopBarType> {
     val viewModel = hiltViewModel<AppViewModel>()
-
-    val initialIndex = PlayerDatastore.pagerIndex
-    val categoryPagerState = rememberCategoryPagerState(initialIndex)
-    val categoryTitlePagerState = rememberCategoryTitlePagerState(initialIndex)
+    val type = viewModel.topBarType.collectAsState(initial = TopBarType.None)
+    LaunchedEffect(key1 = type, key2 = categoryPagerState, key3 = categoryTitlePagerState) {
+        val topBar = type.value
+        val enabled = topBar !is TopBarType.Selection
+        categoryTitlePagerState.setEnable(enabled)
+        categoryPagerState.setEnable(enabled)
+        delay(100)
+        if (topBar is TopBarType.Selection) {
+            categoryPagerState.animateTo(
+                categoryPagerState.currentIndex,
+                requesterId = this,
+                animationSpec = tween(400)
+            )
+        }
+    }
     LaunchedEffect(key1 = categoryPagerState, key2 = categoryTitlePagerState) {
         launch {
             snapshotFlow {
@@ -67,7 +70,7 @@ fun MainCategoryPage(
                     categoryPagerState.animateTo(
                         it.index,
                         categoryTitlePagerState,
-                        animationSpec = tween(100)
+                        animationSpec = tween(400)
                     )
                 }
             }
@@ -86,22 +89,24 @@ fun MainCategoryPage(
                 }
         }
     }
-    val type by viewModel.topBarType.collectAsState(initial = TopBarType.None)
-    LaunchedEffect(key1 = type, key2 = categoryPagerState, key3 = categoryTitlePagerState) {
-        val enabled = type !is TopBarType.Selection
-        categoryTitlePagerState.setEnable(enabled)
-        categoryPagerState.setEnable(enabled)
-        delay(100)
-        if (type is TopBarType.Selection) {
-            categoryPagerState.animateTo(
-                categoryPagerState.currentIndex,
-                requesterId = this,
-                animationSpec = tween(200)
-            )
-        }
+    return type
+}
+
+
+@Composable
+fun MainCategoryPage(
+    nav: NavHostController,
+    trackViewModel: TracksViewModel,
+    categoryViewModel: CategoryViewModel,
+    queueViewModel: QueueViewModel
+) {
+    val onSearch = rememberSaveable {
+        mutableStateOf(false)
     }
-
-
+    val initialIndex = PlayerDatastore.pagerIndex
+    val categoryPagerState = rememberCategoryPagerState(initialIndex)
+    val categoryTitlePagerState = rememberCategoryTitlePagerState(initialIndex)
+    val type by PagerConnections(categoryPagerState = categoryPagerState, categoryTitlePagerState = categoryTitlePagerState)
     Column(
         modifier = Modifier
             .fillMaxSize()

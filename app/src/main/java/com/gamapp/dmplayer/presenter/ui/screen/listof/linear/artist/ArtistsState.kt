@@ -40,4 +40,8 @@ class ArtistsState (private val context:Context): BaseListState<ArtistModel>() {
         }
     }
 
+    @Composable
+    override fun isItemFocused(item: ArtistModel): Boolean {
+        return false
+    }
 }

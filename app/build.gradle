@@ -8,6 +8,7 @@ plugins {
     id 'kotlin-parcelize'
     id 'androidx.navigation.safeargs.kotlin'
     id 'org.jetbrains.kotlin.android'
+
 }
 
 android {
@@ -49,13 +50,12 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
-        useIR = true
     }
     buildFeatures {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion Versions.compose
+        kotlinCompilerExtensionVersion Versions.composeCompiler
         kotlinCompilerVersion Versions.kotlin
     }
     packagingOptions {
@@ -63,6 +63,10 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+}
+
+kapt {
+    correctErrorTypes true
 }
 
 dependencies {
@@ -75,8 +79,8 @@ dependencies {
     implementation Libs.AndroidX.Compose.runtime
     implementation Libs.AndroidX.Compose.material
     implementation Libs.AndroidX.Compose.materialIconExtended
-    implementation 'androidx.core:core-ktx:+'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0'
     debugImplementation Libs.AndroidX.Compose.uiTooling
     implementation Libs.AndroidX.Compose.uiToolingPreview
     androidTestImplementation Libs.AndroidX.Compose.uiTestJunit
@@ -104,15 +108,25 @@ dependencies {
     androidTestImplementation Libs.AndroidX.Navigation.test
     implementation Libs.AndroidX.Navigation.dynamicFeaturesFragment
 
-    //dagger
-    implementation Libs.Dagger.dagger
-    kapt Libs.Dagger.daggerCompile
-    api Libs.Dagger.daggerAndroid
-    api Libs.Dagger.daggerAndroidSupport
-    kapt Libs.Dagger.daggerAndroidProcessor
-    //dagger hilt
-    implementation Libs.Dagger.hiltAndroid
-    kapt Libs.Dagger.hiltAndroidCompiler
+    implementation 'com.google.dagger:hilt-android:2.42'
+    kapt 'com.google.dagger:hilt-compiler:2.42'
+
+    // For instrumentation tests
+    androidTestImplementation  'com.google.dagger:hilt-android-testing:2.42'
+    kaptAndroidTest 'com.google.dagger:hilt-compiler:2.42'
+
+    // For local unit tests
+    testImplementation 'com.google.dagger:hilt-android-testing:2.42'
+    kaptTest 'com.google.dagger:hilt-compiler:2.42'
+//    //dagger
+//    implementation Libs.Dagger.dagger
+//    kapt Libs.Dagger.daggerCompile
+//    api Libs.Dagger.daggerAndroid
+//    api Libs.Dagger.daggerAndroidSupport
+//    kapt Libs.Dagger.daggerAndroidProcessor
+//    //dagger hilt
+//    implementation Libs.Dagger.hiltAndroid
+//    kapt Libs.Dagger.hiltAndroidCompiler
 
     implementation Libs.AndroidX.Hilt.navigationCompose
     implementation Libs.AndroidX.Hilt.navigationFragment
@@ -149,8 +163,8 @@ dependencies {
     implementation Libs.ExoPlayer.session
 
 //
-    implementation 'com.google.android.material:material:1.6.0'
-    implementation 'com.google.ar:core:1.31.0'
+    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'com.google.ar:core:1.32.0'
     implementation "com.squareup.okhttp3:okhttp:5.0.0-alpha.3"
     implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.3'
 
@@ -168,7 +182,7 @@ dependencies {
 
 
 //test
-    androidTestImplementation "junit:junit:4.12"
+    androidTestImplementation "junit:junit:4.13.2"
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2"
     androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
     androidTestImplementation "com.google.truth:truth:1.0.1"

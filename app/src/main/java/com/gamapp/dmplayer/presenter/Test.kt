@@ -33,13 +33,13 @@ fun Test() {
     }
     
     val context = LocalContext.current
-    LaunchedEffect(key1 = Unit) {
-        withContext(Dispatchers.IO) {
-            bytes = context.resources.assets.open("music.mp3").readBytes().map {
-                it / 256f
-            }
-        }
-    }
+//    LaunchedEffect(key1 = Unit) {
+//        withContext(Dispatchers.IO) {
+//            bytes = context.resources.assets.open("music.mp3").readBytes().map {
+//                it / 256f
+//            }
+//        }
+//    }
     LazyRow(modifier = Modifier.fillMaxSize()) {
         itemsIndexed(
             bytes,

@@ -40,7 +40,9 @@ android {
         jvmTarget = '1.8'
     }
 }
-
+kapt {
+    correctErrorTypes true
+}
 dependencies {
 
     implementation project(path: ':graphics')
@@ -57,21 +59,35 @@ dependencies {
 
 
     implementation Libs.Dagger.dagger
-    implementation 'androidx.core:core-ktx:+'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
-    kapt Libs.Dagger.daggerCompile
-    api Libs.Dagger.daggerAndroid
-    api Libs.Dagger.daggerAndroidSupport
-    kapt Libs.Dagger.daggerAndroidProcessor
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0'
+
+
+//    kapt Libs.Dagger.daggerCompile
+//    api Libs.Dagger.daggerAndroid
+//    api Libs.Dagger.daggerAndroidSupport
+//    kapt Libs.Dagger.daggerAndroidProcessor
+
+    implementation 'com.google.dagger:hilt-android:2.42'
+    kapt 'com.google.dagger:hilt-compiler:2.42'
+
+    // For instrumentation tests
+    androidTestImplementation  'com.google.dagger:hilt-android-testing:2.42'
+    kaptAndroidTest 'com.google.dagger:hilt-compiler:2.42'
+
+    // For local unit tests
+    testImplementation 'com.google.dagger:hilt-android-testing:2.42'
+    kaptTest 'com.google.dagger:hilt-compiler:2.42'
+
     //dagger hilt
     implementation Libs.Dagger.hiltAndroid
     kapt Libs.Dagger.hiltAndroidCompiler
 
     implementation Libs.AndroidX.dataStorePreferences
 
-    kapt Libs.AndroidX.Hilt.compiler
-    implementation Libs.AndroidX.Hilt.navigationCompose
-    implementation Libs.AndroidX.Hilt.navigationFragment
+//    kapt Libs.AndroidX.Hilt.compiler
+//    implementation Libs.AndroidX.Hilt.navigationCompose
+//    implementation Libs.AndroidX.Hilt.navigationFragment
 
 
     implementation Libs.ExoPlayer.core

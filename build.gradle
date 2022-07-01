@@ -1,9 +1,6 @@
 import library.*
 
 buildscript {
-    ext {
-        kotlin_version = '1.6.21'
-    }
     repositories {
         google()
         mavenCentral()
@@ -15,10 +12,11 @@ buildscript {
         classpath Libs.MoshGradlePlugin
         classpath Libs.NavigationGradlePlugin
         classpath Libs.Kotlin.gradlePlugin
-        classpath Libs.Dagger.plugin
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+//        classpath Libs.Dagger.plugin
+        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.42'
     }
 }
+
 allprojects {
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         kotlinOptions {
