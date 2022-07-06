@@ -1,8 +1,11 @@
 # DMPlayer
  dream music player - 
  
+ 
+ - optimized and smooth swiping
  <img src="https://github.com/aliHosseinNezhad/DMPlayer_public/blob/master/images/crossfade.jpg" width ="865" height="384">
  
+ - color change by music cover
  <img src="https://github.com/aliHosseinNezhad/DMPlayer_public/blob/master/images/colorchange.jpg" width ="865" height="384">
  
  
