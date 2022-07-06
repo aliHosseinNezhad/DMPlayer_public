@@ -1,5 +1,6 @@
 package com.gamapp.dmplayer.presenter.ui.screen.category
 
+import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
@@ -28,11 +29,24 @@ import com.gamapp.dmplayer.presenter.viewmodel.CategoryViewModel
 import com.gamapp.dmplayer.presenter.viewmodel.QueueViewModel
 import com.gamapp.dmplayer.presenter.viewmodel.TracksViewModel
 import com.gamapp.layout.categorypager.*
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
+
+
 
 @Composable
-fun PagerConnections(categoryPagerState: CategoryPagerState, categoryTitlePagerState: CategoryTitlePagerState): State<TopBarType> {
+fun PagerConnections(
+    categoryPagerState: CategoryPagerState,
+    categoryTitlePagerState: CategoryTitlePagerState
+): State<TopBarType> {
     val viewModel = hiltViewModel<AppViewModel>()
     val type = viewModel.topBarType.collectAsState(initial = TopBarType.None)
     LaunchedEffect(key1 = type, key2 = categoryPagerState, key3 = categoryTitlePagerState) {
@@ -106,7 +120,10 @@ fun MainCategoryPage(
     val initialIndex = PlayerDatastore.pagerIndex
     val categoryPagerState = rememberCategoryPagerState(initialIndex)
     val categoryTitlePagerState = rememberCategoryTitlePagerState(initialIndex)
-    val type by PagerConnections(categoryPagerState = categoryPagerState, categoryTitlePagerState = categoryTitlePagerState)
+    val type by PagerConnections(
+        categoryPagerState = categoryPagerState,
+        categoryTitlePagerState = categoryTitlePagerState
+    )
     Column(
         modifier = Modifier
             .fillMaxSize()
