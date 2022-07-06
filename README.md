@@ -8,7 +8,7 @@
  <img src="https://github.com/aliHosseinNezhad/DMPlayer_public/blob/master/images/colorchange.jpg" width ="865" height="384">
  
  - Tracks Selection
- <img src"https://github.com/aliHosseinNezhad/DMPlayer_public/blob/master/images/selection.jpg">
+ <img src="https://github.com/aliHosseinNezhad/DMPlayer_public/blob/master/images/selection.jpg">
  
  
  
