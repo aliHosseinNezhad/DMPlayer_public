@@ -2,7 +2,7 @@
  dream music player - 
  
  
- - optimized and smooth swiping
+ - Expand or shrink player  (optimized and smooth swiping)
  <img src="https://github.com/aliHosseinNezhad/DMPlayer_public/blob/master/images/crossfade.jpg" width ="865" height="384">
  
  - color change by music cover
