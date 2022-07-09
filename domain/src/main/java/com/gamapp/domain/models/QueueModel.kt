@@ -14,7 +14,7 @@ data class QueueModel(
     val count: LiveData<Int>,
     val imageIdLive: LiveData<Long?>,
     val default: Boolean = false,
-) : ImagedItemModel {
+) : Image {
     override val imageId: Long get() = imageIdLive.value ?: 0L
     override val defaultImage: Int get() = R.drawable.ic_queues
     override val subtitle: String

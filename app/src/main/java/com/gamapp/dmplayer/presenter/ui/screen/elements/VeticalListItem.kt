@@ -10,7 +10,6 @@ import androidx.compose.material.*
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -27,15 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.asLiveData
-import coil.Coil
 import coil.imageLoader
-import coil.load
 import coil.request.ImageRequest
 import coil.request.ImageResult
-import coil.size.Scale
-import coil.util.CoilUtils
-import com.gamapp.data.repository.collect
-import com.gamapp.dmplayer.presenter.ui.screen.player.buttons.rememberStateOf
 import com.gamapp.dmplayer.presenter.ui.screen.player.toBuffer
 import com.gamapp.dmplayer.presenter.ui.theme.content
 import com.gamapp.dmplayer.presenter.ui.theme.onContent
@@ -43,17 +36,15 @@ import com.gamapp.dmplayer.presenter.ui.theme.onSelection
 import com.gamapp.dmplayer.presenter.ui.theme.primary
 import com.gamapp.dmplayer.presenter.ui.utils.NewLoadImage
 import com.gamapp.dmplayer.presenter.ui.utils.toImageByteArray
-import com.gamapp.domain.models.ImagedItemModel
+import com.gamapp.domain.models.Image
 import com.gamapp.domain.R
 import com.gamapp.layout.rememberState
 import com.gamapp.slider.lazyDerivedState
-import com.gamapp.timeline.AndroidText
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
-import java.nio.ByteBuffer
 
 @Composable
-fun <T : ImagedItemModel> rememberBaseItem(input: T): BaseItem {
+fun <T : Image> rememberBaseItem(input: T): BaseItem {
     val item = remember {
         BaseItem()
     }.apply {
@@ -63,7 +54,7 @@ fun <T : ImagedItemModel> rememberBaseItem(input: T): BaseItem {
 }
 
 class BaseItem {
-    private val itemImaged = mutableStateOf(null as ImagedItemModel?)
+    private val itemImaged = mutableStateOf(null as Image?)
 
     val title = itemImaged.lazyDerivedState {
         it.title
@@ -82,13 +73,13 @@ class BaseItem {
     }
 
 
-    fun <T : ImagedItemModel> set(item: T) {
+    fun <T : Image> set(item: T) {
         itemImaged.value = item
     }
 }
 
 @Composable
-fun <T : ImagedItemModel> LinearItem(
+fun <T : Image> LinearItem(
     modifier: Modifier,
     item: T,
     onClick: () -> Unit,

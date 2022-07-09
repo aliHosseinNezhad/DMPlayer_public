@@ -30,7 +30,7 @@ data class TrackModel(
     val albumId: Long,
     val artistId: Long,
     val dateAdded: Long,
-) : ImagedItemModel, LongIdModel, Parcelable {
+) : BaseTrack, Parcelable {
     override val subtitle: String get() = artist
     override val defaultImage: Int get() = R.drawable.ic_track
     override val imageId: Long

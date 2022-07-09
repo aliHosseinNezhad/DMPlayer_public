@@ -17,6 +17,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gamapp.dmplayer.presenter.ui.screen.ext.Ref
 import com.gamapp.dmplayer.presenter.ui.screen.ext.TrackPlayerScope
 import com.gamapp.dmplayer.presenter.viewmodel.musicplayer.PlayerViewModel
+import com.gamapp.domain.models.BaseTrack
+import com.gamapp.domain.models.BaseTrackModel
 import com.gamapp.domain.models.TrackModel
 import com.gamapp.domain.models.emptyPlayList
 import com.gamapp.pager.RecyclerHorizontalPager
@@ -40,12 +42,7 @@ fun TrackPlayerScope.TracksImagePager(
             state.motionValue == 0f
         }
     }
-    val playList by viewModel.playList.collectAsState(emptyPlayList())
-    val tracks by remember {
-        derivedStateOf {
-            playList.order
-        }
-    }
+    val tracks by viewModel.currentPlayList.collectAsState(emptyList())
     val currentTrack by viewModel.currentTrack.collectAsState()
     val selectedIndex by remember {
         derivedStateOf {
@@ -106,7 +103,7 @@ fun TrackPlayerScope.TracksImagePager(
 
 @Composable
 fun TrackImage(
-    trackModel: TrackModel,
+    trackModel: BaseTrackModel,
     bound: State<DpSize>,
     state: PlayerData,
     motionHeight: Ref<Int>,

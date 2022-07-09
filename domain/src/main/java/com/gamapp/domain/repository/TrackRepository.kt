@@ -7,6 +7,7 @@ import com.gamapp.domain.models.AlbumModel
 import com.gamapp.domain.models.ArtistModel
 import com.gamapp.domain.models.TrackModel
 import com.gamapp.domain.sealedclasses.Sort
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 interface TrackRepository {
@@ -18,5 +19,6 @@ interface TrackRepository {
     suspend fun removeTrack(track: TrackModel)
     suspend fun removeTracks(tracks: List<TrackModel>)
     suspend fun updateTracks(tracks: List<TrackModel>, contentValues: ContentValues)
+    fun getTracksById(ids: List<Long>): Flow<List<TrackModel>>
     val trackSortOrder: MutableStateFlow<Sort<TrackModel>>
 }

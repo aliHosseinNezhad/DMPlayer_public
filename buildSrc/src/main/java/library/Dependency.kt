@@ -6,7 +6,7 @@ object Versions {
     const val composeCompiler = "1.2.0"
     const val room = "2.4.2"
     const val kotlin = "1.7.0"
-    const val gradlePlugin = "7.0.4"
+    const val gradlePlugin = "7.2.0"
     const val coroutine = "1.6.1"
     const val dagger = "2.38.1"
     const val navigation = "2.4.1"

@@ -1,5 +1,5 @@
 package com.gamapp.domain.models
 
-interface CategoryModel :ImagedItemModel {
+interface CategoryModel :Image {
     val tracks: List<TrackModel>
 }

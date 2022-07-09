@@ -1,6 +1,7 @@
 package com.gamapp.dmplayer.presenter.ui.screen.dialog
 
 import com.gamapp.dmplayer.presenter.ui.screen.dialog.defaults.*
+import com.gamapp.domain.models.BaseTrackModel
 import com.gamapp.domain.models.TrackModel
 
 fun DialogsState.showRemoveTrackDialog(

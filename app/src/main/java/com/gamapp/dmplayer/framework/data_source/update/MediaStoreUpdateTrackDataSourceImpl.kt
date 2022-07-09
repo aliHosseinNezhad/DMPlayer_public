@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
+import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -30,11 +31,11 @@ import javax.inject.Inject
 class MediaStoreUpdateTrackDataSourceImpl @Inject constructor(
     @ApplicationContext
     private val context: Context,
-    private val arp: ActivityRegisterResultProvider
-):MediaStoreUpdateTrackDataSource {
+    private val activityResultRegistry: Lazy<ActivityResultRegistry?>
+) : MediaStoreUpdateTrackDataSource {
     override suspend fun update(ids: List<Long>, contentValues: ContentValues): Unit =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            context.updateR(ids, contentValues, arp)
+            context.updateR(ids, contentValues, activityResultRegistry.value)
         } else {
             context.update(ids, contentValues)
         }
@@ -44,11 +45,12 @@ class MediaStoreUpdateTrackDataSourceImpl @Inject constructor(
 suspend fun Context.updateR(
     ids: List<Long>,
     contentValues: ContentValues,
-    arp: ActivityRegisterResultProvider
+    activityRegister: ActivityResultRegistry?
 ): Unit = withContext(Dispatchers.IO) {
-    val activityRegister = arp.activityRegister ?: return@withContext
     val channel = Channel<Boolean>()
     val key = UUID.randomUUID().toString()
+    if (activityRegister == null)
+        return@withContext
     val launcher =
         activityRegister.register(key, ActivityResultContracts.StartIntentSenderForResult()) {
             val hasPermission = it.resultCode == Activity.RESULT_OK

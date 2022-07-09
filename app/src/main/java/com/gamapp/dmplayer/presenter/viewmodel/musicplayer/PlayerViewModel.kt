@@ -10,6 +10,9 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import com.gamapp.color_palette.createPalette
+import com.gamapp.color_palette.getTwoOrDefaults
+import com.gamapp.dmplayer.framework.player.PlayerConnection
+import com.gamapp.dmplayer.framework.player.PlayerConnectionImpl
 import com.gamapp.dmplayer.presenter.models.TrackPlayModel
 import com.gamapp.dmplayer.presenter.models.emptyPlayModel
 import com.gamapp.dmplayer.presenter.ui.screen.menu.PlayerMenu
@@ -17,27 +20,35 @@ import com.gamapp.dmplayer.presenter.ui.theme.primary
 import com.gamapp.dmplayer.presenter.ui.theme.secondary
 import com.gamapp.dmplayer.presenter.ui.utils.toImage
 import com.gamapp.dmplayer.presenter.ui.utils.toImageByteArray
-import com.gamapp.domain.player_interface.PlayerConnector
-import com.gamapp.domain.models.TrackModel
+import com.gamapp.domain.models.BaseTrackModel
+import com.gamapp.domain.player_interface.PlayerData
+import com.gamapp.domain.usecase.data.tracks.GetTracksByIdUseCase
 import com.gamapp.domain.usecase.interacts.FavoriteInteracts
 import com.gamapp.domain.usecase.interacts.PlayerInteracts
-import com.gamapp.color_palette.getTwoOrDefaults
+import com.google.android.exoplayer2.Player
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
+    private val getTracksByIdUseCase: GetTracksByIdUseCase,
     private val trackPlayerModel: TrackPlayerModelImp,
-    private val player: PlayerConnector,
+    _connection: PlayerConnectionImpl,
     val playerInteracts: PlayerInteracts,
     val favoriteInteracts: FavoriteInteracts,
     val playerMenu: PlayerMenu,
 ) : ViewModel(),
-    TrackPlayerModel by trackPlayerModel,
-    PlayerConnector by player {
-    suspend fun init(context: Context, track: TrackModel?) {
-        if (track != null)
+    TrackPlayerModel by trackPlayerModel {
+    val playerConnection: PlayerConnection = _connection
+    init {
+        addCloseable(_connection)
+    }
+    suspend fun init(context: Context, baseTrack: BaseTrackModel?) {
+        val track = if (baseTrack != null) {
+            getTracksByIdUseCase(baseTrack.id)
+        } else null
+        if (track != null) {
             trackPlayerModel.musicModel.value = TrackPlayModel(
                 id = track.id,
                 title = track.title,
@@ -46,7 +57,7 @@ class PlayerViewModel @Inject constructor(
                 fileName = track.fileName,
                 bitmap = context.bitmap(track.id)
             )
-        else trackPlayerModel.musicModel.value = emptyPlayModel()
+        } else trackPlayerModel.musicModel.value = emptyPlayModel()
         val bitmap = musicModel.value.bitmap
         if (bitmap != null) {
             setPalette(bitmap.asAndroidBitmap())
@@ -73,6 +84,10 @@ class PlayerViewModel @Inject constructor(
             secondary
         )
         return mutableStateOf(colors)
+    }
+
+    fun setPlayerListAndCurrent(first: BaseTrackModel, tracks: List<BaseTrackModel>) {
+
     }
 }
 

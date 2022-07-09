@@ -40,7 +40,8 @@ class TrackPlayerModelImp
     @ApplicationContext private val context: Context,
     private val favoriteInteracts: FavoriteInteracts,
     private val playerData: PlayerData
-) : TrackPlayerModel, PlayerData by playerData {
+) : TrackPlayerModel,
+    PlayerData by playerData {
     override val heartAnimationState: HeartAnimationState = HeartAnimationState()
     override val isDynamicGradientEnable: MutableState<Boolean> = mutableStateOf(true)
     override val musicModel: MutableState<TrackPlayModel> = mutableStateOf(TrackPlayModel())

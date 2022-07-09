@@ -23,12 +23,12 @@ import com.gamapp.custom.CustomIconButton
 import com.gamapp.dmplayer.R
 import com.gamapp.dmplayer.presenter.ui.screen.popup_menu_layout.SortPopupMenu
 import com.gamapp.dmplayer.presenter.ui.theme.onContent
-import com.gamapp.domain.models.ImagedItemModel
+import com.gamapp.domain.models.Image
 import com.gamapp.domain.sealedclasses.*
 import kotlinx.coroutines.flow.Flow
 
 @Composable
-fun <T : ImagedItemModel> RowScope.SortItem(
+fun <T : Image> RowScope.SortItem(
     sort: Flow<Sort<T>>,
     setOrder: (Order) -> Unit,
     onSelected: (Sort.Type<T>) -> Unit,

@@ -28,6 +28,7 @@ import com.gamapp.dmplayer.presenter.viewmodel.musicplayer.PlayerViewModel
 fun RowScope.AddToQueueButton() {
     val viewModel: PlayerViewModel = hiltViewModel()
     val dialog = dialogs()
+    val scope = rememberCoroutineScope()
     CustomIconButton(
         onClick = {
             viewModel.currentTrack.value?.let {

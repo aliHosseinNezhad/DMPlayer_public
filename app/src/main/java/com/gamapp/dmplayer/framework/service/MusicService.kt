@@ -10,10 +10,8 @@ import android.os.ResultReceiver
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.gamapp.dmplayer.Constant
-import com.gamapp.dmplayer.framework.player.PlayerConnectorImpl
 import com.gamapp.dmplayer.framework.player.PlayerDataImpl
 import com.gamapp.dmplayer.framework.player.toMediaItem
 import com.gamapp.dmplayer.framework.player.toMediaMetaData
@@ -26,7 +24,6 @@ import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.upstream.DefaultDataSource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
-import java.lang.Exception
 import javax.inject.Inject
 
 
@@ -50,8 +47,8 @@ class MusicService : MediaBrowserServiceCompat() {
     @Inject
     lateinit var defaultMediaSourceFactory: DefaultDataSource.Factory
 
-    @Inject
-    lateinit var playerAccessManager: PlayerConnectorImpl
+//    @Inject
+//    lateinit var playerAccessManager: PlayerConnectorImpl
 
     @Inject
     lateinit var playerData: PlayerDataImpl
@@ -92,13 +89,14 @@ class MusicService : MediaBrowserServiceCompat() {
 //        mediaSessionConnector.setPlaybackPreparer()
         mediaSessionConnector.setQueueNavigator(MediaQueueNavigator())
         musicNotificationManager.setPlayer(player)
-        playerAccessManager.onCreate(player = player, serviceScope = serviceScope)
-        playerData.onCreate(serviceScope = serviceScope, player = player)
+//        playerAccessManager.onCreate(player = player, serviceScope = serviceScope)
+//        playerData.onCreate(serviceScope = serviceScope, player = player)
     }
 
     inner class MediaQueueNavigator : TimelineQueueNavigator(mediaSession) {
         override fun getMediaDescription(player: Player, windowIndex: Int): MediaDescriptionCompat {
-            return playerData.playList.value.order[windowIndex].toMediaMetaData()!!.description
+            TODO()
+//            return playerData.playList.value.order[windowIndex].toMediaMetaData()!!.description
         }
     }
 
@@ -152,17 +150,17 @@ class MusicService : MediaBrowserServiceCompat() {
         if (parentId == Constant.MUSIC_SERVICE_ROOT_ID) {
             result.detach()
             serviceScope.launch {
-                playerData.playList.collect {
-                    it.order.mapNotNull { track ->
-                        track.toMediaMetaData()?.toMediaItem()
-                    }.let { mediaItems ->
-                        try {
-                            result.sendResult(mediaItems.toMutableList())
-                        } catch (e: Exception) {
-
-                        }
-                    }
-                }
+//                playerData.playList.collect {
+//                    it.order.mapNotNull { track ->
+//                        track.toMediaMetaData()?.toMediaItem()
+//                    }.let { mediaItems ->
+//                        try {
+//                            result.sendResult(mediaItems.toMutableList())
+//                        } catch (e: Exception) {
+//
+//                        }
+//                    }
+//                }
             }
         } else {
             result.sendResult(null)
@@ -171,8 +169,8 @@ class MusicService : MediaBrowserServiceCompat() {
 
     override fun onDestroy() {
         super.onDestroy()
-        playerAccessManager.onDestroy()
-        playerData.onDestroy()
+//        playerAccessManager.onDestroy()
+//        playerData.onDestroy()
         musicNotificationManager.setPlayer(null)
         serviceScope.cancel()
         player.release()

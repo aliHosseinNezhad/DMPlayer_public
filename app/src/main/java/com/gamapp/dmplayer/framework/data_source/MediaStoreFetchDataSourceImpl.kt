@@ -65,7 +65,7 @@ class MediaStoreFetchDataSourceImpl @Inject constructor(
     mediaStoreChangeNotifier: MediaStoreChangeNotifier,
     private val musicDao: MusicDao,
     private val playerData: com.gamapp.domain.player_interface.PlayerData,
-    private val playerConnector: com.gamapp.domain.player_interface.PlayerConnector
+//    private val playerConnector: com.gamapp.domain.player_interface.PlayerConnector
 ) : AbstractMediaStoreFetchDataSource(context = context) {
     private val tracksFlow = MutableStateFlow<List<TrackModel>>(emptyList())
     private val job = SupervisorJob()
@@ -132,30 +132,31 @@ class MediaStoreFetchDataSourceImpl @Inject constructor(
     }
 
     private suspend fun updatePlayer(tracks: List<TrackModel>) {
-        val musics = playerData.playList.value.tracks.map { it.copy() }.toMutableList()
-        val input = tracks.map { it to New }
-        val previous = musics.map { it to Current }
-        val sum = input + previous
-        val result = sum.groupBy {
-            it.first.id
-        }.mapNotNull {
-            if (it.value.size == 2) {
-                it.value.firstOrNull { it.second == New }!!.first to Update
-            } else {
-                val item = it.value.first()
-                if (item.second == Current) item.first to Remove
-                else
-                    null
-            }
-        }
-        val toDelete =
-            result.mapNotNull { if (it.second == Remove) it.first else null }.map { it.id }
-        val currentTrack = playerData.currentTrack.value
-        if (result.isEmpty())
-            playerConnector.setPlayList(emptyList())
-        else {
-            playerConnector.removePlayListItems(toDelete)
-        }
+        TODO()
+//        val musics = playerData.playList.value.tracks.map { it.copy() }.toMutableList()
+//        val input = tracks.map { it to New }
+//        val previous = musics.map { it to Current }
+//        val sum = input + previous
+//        val result = sum.groupBy {
+//            it.first.id
+//        }.mapNotNull {
+//            if (it.value.size == 2) {
+//                it.value.firstOrNull { it.second == New }!!.first to Update
+//            } else {
+//                val item = it.value.first()
+//                if (item.second == Current) item.first to Remove
+//                else
+//                    null
+//            }
+//        }
+//        val toDelete =
+//            result.mapNotNull { if (it.second == Remove) it.first else null }.map { it.id }
+//        val currentTrack = playerData.currentTrack.value
+//        if (result.isEmpty())
+//            playerConnector.setPlayList(emptyList())
+//        else {
+//            playerConnector.removePlayListItems(toDelete)
+//        }
     }
 }
 

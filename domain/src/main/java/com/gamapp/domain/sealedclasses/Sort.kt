@@ -1,8 +1,8 @@
 package com.gamapp.domain.sealedclasses
 
-import com.gamapp.domain.models.ImagedItemModel
+import com.gamapp.domain.models.Image
 
-fun <T : ImagedItemModel> List<T>.reversBy(order: Order): List<T> {
+fun <T : Image> List<T>.reversBy(order: Order): List<T> {
     return if (order == Order.STE) this
     else this.reversed()
 }
@@ -16,8 +16,8 @@ enum class Order {
     ETS
 }
 
-abstract class Sort<T : ImagedItemModel> {
-    abstract class Type<T : ImagedItemModel> {
+abstract class Sort<T : Image> {
+    abstract class Type<T : Image> {
         abstract fun method(items: List<T>): List<T>
         abstract val name: String
     }

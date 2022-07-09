@@ -10,10 +10,10 @@ import kotlinx.coroutines.Job
 import javax.inject.Inject
 
 
-interface CategoryLoader {
-    fun albums(): Job
-    fun artists(): Job
-}
+//interface CategoryLoader {
+//    fun albums(): Job
+//    fun artists(): Job
+//}
 
 @HiltViewModel
 class CategoryViewModel @Inject constructor(

@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gamapp.dmplayer.R
 import com.gamapp.dmplayer.presenter.ui.theme.primary
-import com.gamapp.domain.models.ImagedItemModel
+import com.gamapp.domain.models.Image
 import com.gamapp.domain.sealedclasses.Sort
 
 @Composable
@@ -86,7 +86,7 @@ internal fun rememberSortPopupMeasurePolicy() = remember {
 }
 
 @Composable
-fun <T: ImagedItemModel> SortPopupMenu(
+fun <T: Image> SortPopupMenu(
     show: MutableState<Boolean>,
     items: List<Sort.Type<T>>,
     onSelect: Sort.Type<T>.() -> Unit,

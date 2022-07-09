@@ -9,7 +9,7 @@ import kotlinx.parcelize.Parcelize
 data class AlbumModel(
     override val id: Long,
     override val tracks: List<TrackModel>
-) : CategoryModel,LongIdModel, Parcelable {
+) : CategoryModel,LongId, Parcelable {
     @IgnoredOnParcel
     val count = tracks.size
     @IgnoredOnParcel

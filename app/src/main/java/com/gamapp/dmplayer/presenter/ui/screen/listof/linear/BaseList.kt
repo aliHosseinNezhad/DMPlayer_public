@@ -18,13 +18,13 @@ import com.gamapp.dmplayer.presenter.ui.screen.popup_menu_layout.TextPopupMenu
 import com.gamapp.dmplayer.presenter.ui.screen.elements.LinearItem
 import com.gamapp.dmplayer.presenter.utils.SelectionManager
 import com.gamapp.domain.ACTIONS
-import com.gamapp.domain.models.ImagedItemModel
+import com.gamapp.domain.models.Image
 import kotlinx.coroutines.flow.MutableStateFlow
 
 
 interface SortBarVisibility
 
-abstract class BaseListState<T : ImagedItemModel> {
+abstract class BaseListState<T : Image> {
     val selectionManager: SelectionManager<T> = SelectionManager()
     abstract val sortBarVisibility: SortBarVisibility
     var canHideTrackPlayer by mutableStateOf(true)
@@ -83,7 +83,7 @@ abstract class BaseListState<T : ImagedItemModel> {
 }
 
 @Composable
-fun <T : ImagedItemModel> BaseList(
+fun <T : Image> BaseList(
     items: List<T>,
     state: BaseListState<T>,
     modifier: Modifier,

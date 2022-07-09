@@ -25,8 +25,7 @@ import com.gamapp.dmplayer.presenter.viewmodel.musicplayer.PlayerViewModel
 @Composable
 fun PlayList(modifier: Modifier, state: PlayerState) {
     val viewModel = viewModel<PlayerViewModel>()
-    val playList by viewModel.playList.collectAsState(com.gamapp.domain.models.PlayList(emptyList()))
-    val tracks = playList.order
+    val tracks by viewModel.playList.collectAsState()
     val baseTrackState = rememberBaseTrackState {
         sortBarVisibility = TrackSortBarVisibility.Invisible
         canHideTrackPlayer = false

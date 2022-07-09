@@ -1,23 +1,22 @@
 package com.gamapp.dmplayer.framework.player
 
+import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
+import com.gamapp.domain.models.BaseTrackModel
+import com.gamapp.domain.models.TrackModel
 import com.gamapp.domain.player_interface.PlayerData
 import com.gamapp.domain.player_interface.RepeatMode
-import com.gamapp.domain.player_interface.emit
-import com.gamapp.domain.models.PlayList
-import com.gamapp.domain.models.TrackModel
-import com.gamapp.domain.player_interface.toRepeatMode
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.text.ExoplayerCuesDecoder
-import kotlinx.coroutines.*
+import com.gamapp.domain.player_interface.tryEmit
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
-
 
 
 class CancelableCoroutine(scope: CoroutineScope) : CoroutineScope by scope {
@@ -39,92 +38,81 @@ class CancelableCoroutine(scope: CoroutineScope) : CoroutineScope by scope {
         } catch (e: CancellationException) {
         }
     }
-
 }
-
 
 @Singleton
 class PlayerDataImpl @Inject constructor() : PlayerData {
-    private var player: ExoPlayer? = null
-    private val listener: Player.Listener = object : Player.Listener {
-        override fun onEvents(player: Player, events: Player.Events) {
-            if (events.contains(Player.EVENT_IS_PLAYING_CHANGED)) {
-                isPlaying emit player.isPlaying
-                cancelableCoroutine.start {
-                    while (player.isPlaying) {
-                        delay(100)
-                        duration emit player.duration
-                        currentPosition emit player.currentPosition
-                    }
-                }
-            }
-            val id = player.currentMediaItem?.let {
-                it.mediaId.toLongOrNull() ?: -1
-            }
-            val currentMusicItem = playList.value.tracks.find { it.id == id }
-            currentTrack emit (currentMusicItem)
-            duration emit player.duration
-            currentPosition emit player.currentPosition
-            shuffle emit player.shuffleModeEnabled
-
-        }
-
-        override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
-            super.onShuffleModeEnabledChanged(shuffleModeEnabled)
-            playList emit playList.value.copy(shuffle = shuffleModeEnabled)
-        }
-
-        override fun onRepeatModeChanged(repeatMode: Int) {
-            this@PlayerDataImpl.repeatMode emit repeatMode.toRepeatMode()
-        }
-    }
-    private lateinit var scope: CoroutineScope
-    private lateinit var cancelableCoroutine: CancelableCoroutine
-
-    fun onCreate(serviceScope: CoroutineScope, player: ExoPlayer) {
-        scope = serviceScope
-        cancelableCoroutine = CancelableCoroutine(scope)
-        setPlayer(player)
-    }
-
-    private fun setPlayer(player: ExoPlayer) {
-        player.addListener(listener)
-        this.player = player
-    }
-
-    fun onDestroy() {
-        try {
-            player?.removeListener(listener)
-            listeners.forEach {
-                player?.removeListener(it)
-            }
-        } catch (e: Exception) {
-        }
-    }
-
-    override fun addListener(listener: Player.Listener) {
-        player?.let {
-            listeners += listener
-            it.addListener(listener)
-        }
-    }
-
-    private val listeners = mutableListOf<Player.Listener>()
-    val concatenatingMediaSource = ConcatenatingMediaSource()
     override val isPlaying: MutableStateFlow<Boolean> = MutableStateFlow(false)
     override val duration: MutableStateFlow<Long> = MutableStateFlow(0L)
     override val currentPosition: MutableStateFlow<Long> = MutableStateFlow(0L)
+    override val progress: Flow<Float> = MutableStateFlow(0f)
     override val shuffle: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    override val progress: Flow<Float> = duration.combine(currentPosition, transform = { a, b ->
-        try {
-            b / a.toFloat()
-        } catch (e: Exception) {
-            0f
-        }
-    })
     override val repeatMode: MutableStateFlow<RepeatMode> = MutableStateFlow(RepeatMode.OFF)
-
     override val currentTrack: MutableStateFlow<TrackModel?> = MutableStateFlow(null)
-    override val playList: MutableStateFlow<PlayList> =
-        MutableStateFlow(PlayList(emptyList()))
+    override val playList: MutableStateFlow<List<TrackModel>> = MutableStateFlow(emptyList())
+
+    private val callback = object : MediaControllerCompat.Callback() {
+        val data = this@PlayerDataImpl
+        override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
+            super.onPlaybackStateChanged(state)
+            if (state != null) {
+                currentPosition tryEmit state.position
+                val playbackState = state.state
+                isPlaying tryEmit (playbackState == PlaybackStateCompat.STATE_PLAYING)
+            }
+        }
+
+        override fun onRepeatModeChanged(repeatMode: Int) {
+            super.onRepeatModeChanged(repeatMode)
+            data.repeatMode.tryEmit(RepeatMode.toRepeatMode(repeatMode))
+        }
+
+        override fun onShuffleModeChanged(shuffleMode: Int) {
+            super.onShuffleModeChanged(shuffleMode)
+            data.shuffle.tryEmit(shuffleMode != PlaybackStateCompat.SHUFFLE_MODE_NONE)
+        }
+
+        override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
+            super.onMetadataChanged(metadata)
+            if (metadata != null) {
+                val durationKey = MediaMetadataCompat.METADATA_KEY_DURATION
+                val duration = metadata.getLong(durationKey)
+                data.duration tryEmit duration
+                val mediaIdKey = MediaMetadataCompat.METADATA_KEY_MEDIA_ID
+                val item = try {
+                    BaseTrackModel(
+                        id = metadata.getString(mediaIdKey).toLong(),
+                        title = metadata.description.title.toString(),
+                        subtitle = metadata.description.subtitle.toString()
+                    )
+                } catch (e: Exception) {
+                    null
+                }
+                TODO()
+//                data.currentTrack tryEmit item
+            }
+        }
+
+        override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>?) {
+            super.onQueueChanged(queue)
+            val medias = queue?.map {
+                BaseTrackModel(
+                    id= it.queueId,
+                    title = it.description.title.toString(),
+                    subtitle = it.description.subtitle.toString()
+                )
+            } ?: emptyList()
+            TODO()
+//            currentPlayList tryEmit medias
+        }
+    }
+
+
+    fun register(controller: MediaControllerCompat) {
+        controller.registerCallback(callback)
+    }
+
+    fun unregister(controller: MediaControllerCompat) {
+        controller.unregisterCallback(callback)
+    }
 }

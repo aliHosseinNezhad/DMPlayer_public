@@ -15,11 +15,11 @@ import com.gamapp.dmplayer.presenter.ui.screen.topbar.SelectionBar
 import com.gamapp.dmplayer.presenter.utils.SelectionManager
 import com.gamapp.dmplayer.presenter.utils.navigationBarHeight
 import com.gamapp.dmplayer.presenter.utils.statusBarHeight
-import com.gamapp.domain.models.ImagedItemModel
+import com.gamapp.domain.models.Image
 import com.gamapp.layout.CrossFadeLayout
 
 @Composable
-fun <T : ImagedItemModel> topBarType(
+fun <T : Image> topBarType(
     items: List<T>,
     selectionManager: SelectionManager<T>
 ): State<TopBarType> {
@@ -42,7 +42,7 @@ fun <T : ImagedItemModel> topBarType(
 }
 
 
-@Composable fun <T : ImagedItemModel> BaseVerticalTitledList(
+@Composable fun <T : Image> BaseVerticalTitledList(
     title: String,
     items: List<T>,
     state: BaseListState<T>,

@@ -16,6 +16,7 @@ import com.gamapp.domain.sealedclasses.Order
 import com.gamapp.domain.sealedclasses.Sort
 import com.gamapp.domain.sealedclasses.TrackSort
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
@@ -85,5 +86,9 @@ class TrackRepositoryImpl @Inject constructor(
 
     override suspend fun updateTracks(tracks: List<TrackModel>, contentValues: ContentValues) {
         updateTrackDataSource.update(tracks.map { it.id }, contentValues)
+    }
+
+    override fun getTracksById(ids: List<Long>): Flow<List<TrackModel>> {
+        return mediaStoreFetchDataSource.getTracksByIds(ids)
     }
 }

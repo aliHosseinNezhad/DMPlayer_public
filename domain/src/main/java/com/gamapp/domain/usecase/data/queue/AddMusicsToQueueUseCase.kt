@@ -1,5 +1,6 @@
 package com.gamapp.domain.usecase.data.queue
 
+import com.gamapp.domain.models.BaseTrackModel
 import com.gamapp.domain.models.TrackModel
 import com.gamapp.domain.repository.QueueRepository
 import javax.inject.Inject
