@@ -1,6 +1,10 @@
 package com.gamapp.domain.usecase.player
 
+import javax.inject.Inject
 
-interface SeekBarUseCase  {
-    suspend operator fun invoke(progress: Float)
+
+class SeekBarUseCase @Inject constructor() {
+    suspend operator fun invoke(progress: Float){
+
+    }
 }

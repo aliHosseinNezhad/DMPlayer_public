@@ -1,7 +1,9 @@
 package com.gamapp.domain.usecase.player
 
-interface ShuffleUseCase {
-    suspend operator fun invoke()
+import javax.inject.Inject
 
-    suspend operator fun invoke(enable: Boolean)
+class ShuffleUseCase @Inject constructor(){
+    suspend operator fun invoke(){}
+
+    suspend operator fun invoke(enable: Boolean){}
 }

@@ -61,16 +61,6 @@ class MusicServiceConnection @Inject constructor(
     }
 
     val transportControls: MediaControllerCompat.TransportControls? get() = mediaController?.transportControls
-//
-//    fun test() {
-//        transportControls.setPlayList(listOf())
-//    }
-//
-//    fun MediaControllerCompat.TransportControls.setPlayList(playList: List<TrackModel>) {
-//        val bundle = Bundle()
-//        bundle.putLongArray("playList", playList.map { it.id }.toLongArray())
-//        transportControls.sendCustomAction("playListAndPlay", bundle)
-//    }
 
     private inner class MediaBrowserConnectionCallback(
         private val context: Context

@@ -1,5 +1,9 @@
 package com.gamapp.domain.usecase.player
 
-interface FastForwardUseCase  {
-     suspend operator fun invoke()
+import javax.inject.Inject
+
+class FastForwardUseCase @Inject constructor()  {
+     suspend operator fun invoke() {
+
+     }
 }
