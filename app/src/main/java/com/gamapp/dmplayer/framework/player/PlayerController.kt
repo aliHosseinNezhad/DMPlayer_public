@@ -1,14 +1,9 @@
 package com.gamapp.dmplayer.framework.player
 
 import android.support.v4.media.session.MediaControllerCompat
+import com.gamapp.domain.player_interface.PlayerController
 
 
-interface PlayerController {
-    fun play()
-    fun pause()
-    fun fastForward()
-    fun fastRewind()
-}
 class PlayerControllerImpl(private val _controller: () -> MediaControllerCompat.TransportControls?) :
     PlayerController {
     private val controller get() = _controller()

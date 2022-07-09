@@ -6,7 +6,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import com.gamapp.domain.models.BaseTrackModel
 import com.gamapp.domain.models.TrackModel
-import com.gamapp.domain.player_interface.PlayerData
+import com.gamapp.domain.player_interface.PlayerEvents
 import com.gamapp.domain.player_interface.RepeatMode
 import com.gamapp.domain.player_interface.tryEmit
 import kotlinx.coroutines.CancellationException
@@ -15,33 +15,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Singleton
 
-
-class CancelableCoroutine(scope: CoroutineScope) : CoroutineScope by scope {
-    private var job: Job? = null
-    fun start(scope: suspend () -> Unit) {
-        try {
-            job?.cancel()
-            job = launch {
-                scope()
-            }
-        } catch (e: CancellationException) {
-
-        }
-    }
-
-    fun stop() {
-        try {
-            job?.cancel()
-        } catch (e: CancellationException) {
-        }
-    }
-}
-
-@Singleton
-class PlayerDataImpl @Inject constructor() : PlayerData {
+class PlayerDataImpl : PlayerEvents {
     override val isPlaying: MutableStateFlow<Boolean> = MutableStateFlow(false)
     override val duration: MutableStateFlow<Long> = MutableStateFlow(0L)
     override val currentPosition: MutableStateFlow<Long> = MutableStateFlow(0L)

@@ -9,49 +9,44 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.DropdownMenu
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.ViewCompat
 import androidx.core.view.plusAssign
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.gamapp.data.db.ApplicationDatastore
 import com.gamapp.data.db.PlayerDatastore
-import com.gamapp.graphics.R
-import com.gamapp.dmplayer.framework.ActivityRegisterResultResultProviderImpl
 import com.gamapp.dmplayer.framework.service.MusicService
+import com.gamapp.dmplayer.presenter.ui.navigation.SetUpNavigation
 import com.gamapp.dmplayer.presenter.ui.screen.PermissionScreen
 import com.gamapp.dmplayer.presenter.ui.screen.PermissionScreenCallback
-import com.gamapp.dmplayer.presenter.ui.navigation.SetUpNavigation
 import com.gamapp.dmplayer.presenter.ui.screen.player.TrackPlayerScreen
 import com.gamapp.dmplayer.presenter.ui.theme.PlayerTheme
 import com.gamapp.dmplayer.presenter.ui.theme.primary
 import com.gamapp.dmplayer.presenter.utils.isPermissionsGranted
+import com.gamapp.domain.player_interface.PlayerConnection
+import com.gamapp.domain.player_interface.setupPlayer
+import com.gamapp.graphics.R
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class LauncherActivity : ComponentActivity() {
+
     @Inject
-    lateinit var activityRegisterResultProviderImpl: ActivityRegisterResultResultProviderImpl
+    lateinit var playerConnection: PlayerConnection
 
     @Inject
     lateinit var io: ApplicationDatastore
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activityRegisterResultProviderImpl.onCreate(this.activityResultRegistry)
-        val intent = Intent(this, MusicService::class.java)
-        startService(intent)
-        window.setFlags(
-            View.SYSTEM_UI_FLAG_LAYOUT_STABLE,
-            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        )
-        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { _, insets ->
-            insets
-        }
+
+        setupPlayer(playerConnection)
+        startMusicService()
+        setupWindowsInsets()
+
         setContent {
             PlayerTheme {
                 PermissionScreen {
@@ -63,9 +58,21 @@ class LauncherActivity : ComponentActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        activityRegisterResultProviderImpl.onDestroy()
+
+    private fun setupWindowsInsets() {
+        window.setFlags(
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE,
+            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        )
+        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { _, insets ->
+            insets
+        }
+    }
+
+    private fun startMusicService(){
+        val intent = Intent(this, MusicService::class.java)
+        startService(intent)
+        setupWindowsInsets()
     }
 
     private fun setContent() {

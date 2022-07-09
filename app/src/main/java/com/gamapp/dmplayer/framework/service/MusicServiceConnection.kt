@@ -24,6 +24,7 @@ sealed interface MusicControllerConnectionState {
     object ConnectionFailed : MusicControllerConnectionState
 }
 
+@Singleton
 class MusicServiceConnection @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
