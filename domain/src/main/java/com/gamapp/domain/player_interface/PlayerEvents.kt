@@ -10,13 +10,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-infix fun <T> MutableStateFlow<T>.tryEmit(input: T) {
-    tryEmit(input)
-}
 
-suspend infix fun <T> MutableStateFlow<T>.emit(input: T) {
-    emit(input)
-}
+
 
 sealed class RepeatMode(val value: Int) {
     object OFF : RepeatMode(PlaybackStateCompat.REPEAT_MODE_NONE)
@@ -46,7 +41,7 @@ fun Int.toRepeatMode(): RepeatMode {
 }
 
 
-interface PlayerData {
+interface PlayerEvents {
     val isPlaying: StateFlow<Boolean>
     val duration: StateFlow<Long>
     val currentPosition: StateFlow<Long>

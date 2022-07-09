@@ -1,38 +1,37 @@
 package com.gamapp.dmplayer.framework.player
 
 import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.session.MediaControllerCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asFlow
 import com.gamapp.dmplayer.Constant
 import com.gamapp.dmplayer.framework.service.MusicControllerConnectionState
 import com.gamapp.dmplayer.framework.service.MusicServiceConnection
 import com.gamapp.domain.models.BaseTrackModel
-import com.gamapp.domain.player_interface.PlayerData
+import com.gamapp.domain.player_interface.PlayerConnection
+import com.gamapp.domain.player_interface.PlayerController
+import com.gamapp.domain.player_interface.PlayerEvents
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import java.io.Closeable
 import javax.inject.Inject
-
-infix fun <T> MutableStateFlow<T>.tryEmit(value: T) {
-    this.tryEmit(value)
-}
+import javax.inject.Singleton
 
 
-interface PlayerConnection : Closeable {
-    val callback: PlayerData
-    val controller: PlayerController
-}
 
+@Singleton
 class PlayerConnectionImpl @Inject constructor(
-    private val musicServiceConnection: MusicServiceConnection,
-    override val callback: PlayerDataImpl
+    private val musicServiceConnection: MusicServiceConnection
 ) : PlayerConnection {
-    private val mediaController get() = musicServiceConnection.mediaController
+    private val mediaController: MediaControllerCompat? get() = musicServiceConnection.mediaController
     private val job = SupervisorJob()
     private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
-    override val controller: PlayerControllerImpl = PlayerControllerImpl {
+    override val controllers: PlayerControllerImpl = PlayerControllerImpl {
         mediaController?.transportControls
     }
+    override val playerEvents: PlayerDataImpl = PlayerDataImpl()
     private val subscriptionCallback = object : MediaBrowserCompat.SubscriptionCallback() {
         override fun onChildrenLoaded(
             parentId: String,
@@ -69,19 +68,23 @@ class PlayerConnectionImpl @Inject constructor(
                 if (it is MusicControllerConnectionState.Connected) {
                     val controller = musicServiceConnection.mediaController
                     if (controller != null) {
-                        callback.register(controller)
+                        playerEvents.register(controller)
                     }
                 }
             }
         }
     }
 
-    override fun close() {
+    fun close() {
         val c = mediaController
         musicServiceConnection.unsubscribe(Constant.MUSIC_SERVICE_ROOT_ID, subscriptionCallback)
         if (c != null) {
-            callback.unregister(c)
+            playerEvents.unregister(c)
         }
         coroutineScope.cancel()
+    }
+
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+
     }
 }

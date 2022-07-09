@@ -64,7 +64,7 @@ class MediaStoreFetchDataSourceImpl @Inject constructor(
     @ApplicationContext context: Context,
     mediaStoreChangeNotifier: MediaStoreChangeNotifier,
     private val musicDao: MusicDao,
-    private val playerData: com.gamapp.domain.player_interface.PlayerData,
+    private val playerEvents: com.gamapp.domain.player_interface.PlayerEvents,
 //    private val playerConnector: com.gamapp.domain.player_interface.PlayerConnector
 ) : AbstractMediaStoreFetchDataSource(context = context) {
     private val tracksFlow = MutableStateFlow<List<TrackModel>>(emptyList())

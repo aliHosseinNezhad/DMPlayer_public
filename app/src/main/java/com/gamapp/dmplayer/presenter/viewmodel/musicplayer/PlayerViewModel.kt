@@ -21,11 +21,9 @@ import com.gamapp.dmplayer.presenter.ui.theme.secondary
 import com.gamapp.dmplayer.presenter.ui.utils.toImage
 import com.gamapp.dmplayer.presenter.ui.utils.toImageByteArray
 import com.gamapp.domain.models.BaseTrackModel
-import com.gamapp.domain.player_interface.PlayerData
 import com.gamapp.domain.usecase.data.tracks.GetTracksByIdUseCase
 import com.gamapp.domain.usecase.interacts.FavoriteInteracts
 import com.gamapp.domain.usecase.interacts.PlayerInteracts
-import com.google.android.exoplayer2.Player
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
