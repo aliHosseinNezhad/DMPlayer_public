@@ -114,7 +114,7 @@ fun PlayerScreenAssembler(
     }
     LaunchedEffect(Unit) {
         snapshotFlow { currentTrack }.collectLatest {
-            playerViewModel.init(context, it)
+            playerViewModel.setUpWithTrack(context, it)
         }
     }
     com.gamapp.BackHandler(enabled = data.expandedState) {

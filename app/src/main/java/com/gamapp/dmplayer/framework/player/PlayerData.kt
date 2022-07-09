@@ -9,12 +9,9 @@ import com.gamapp.domain.models.TrackModel
 import com.gamapp.domain.player_interface.PlayerEvents
 import com.gamapp.domain.player_interface.RepeatMode
 import com.gamapp.domain.player_interface.tryEmit
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class PlayerDataImpl : PlayerEvents {
     override val isPlaying: MutableStateFlow<Boolean> = MutableStateFlow(false)

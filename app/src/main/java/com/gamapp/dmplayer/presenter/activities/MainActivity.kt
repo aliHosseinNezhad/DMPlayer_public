@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.ViewCompat
 import com.gamapp.dmplayer.R
-import com.gamapp.dmplayer.framework.ActivityRegisterResultResultProviderImpl
 import com.gamapp.dmplayer.framework.service.MusicService
 import com.gamapp.dmplayer.presenter.ui.theme.PlayerTheme
 import com.gamapp.dmplayer.presenter.ui.theme.dark
@@ -20,7 +19,6 @@ import com.gamapp.dmplayer.presenter.ui.theme.primary
 import com.gamapp.dmplayer.presenter.viewmodel.AppViewModel
 import com.google.accompanist.insets.Insets
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 fun Insets.string(): String {
     return "(top:$top , right:$right , left:$left , bottom:$bottom)"
@@ -29,12 +27,9 @@ fun Insets.string(): String {
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     val appViewModel: AppViewModel by viewModels()
-    @Inject
-    lateinit var activityRegisterResultProviderImpl: ActivityRegisterResultResultProviderImpl
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activityRegisterResultProviderImpl.onCreate(this.activityResultRegistry)
         val intent = Intent(this, MusicService::class.java)
         startService(intent)
         window.setFlags(
@@ -66,10 +61,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        activityRegisterResultProviderImpl.onDestroy()
-    }
 }
 
 

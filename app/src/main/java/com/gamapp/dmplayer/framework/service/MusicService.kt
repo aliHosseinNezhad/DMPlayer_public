@@ -17,6 +17,7 @@ import com.gamapp.dmplayer.framework.player.toMediaItem
 import com.gamapp.dmplayer.framework.player.toMediaMetaData
 import com.gamapp.domain.ACTIONS
 import com.gamapp.domain.mediaStore.MediaStoreChangeHandler
+import com.gamapp.domain.player_interface.PlayerEvents
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
@@ -47,11 +48,9 @@ class MusicService : MediaBrowserServiceCompat() {
     @Inject
     lateinit var defaultMediaSourceFactory: DefaultDataSource.Factory
 
-//    @Inject
-//    lateinit var playerAccessManager: PlayerConnectorImpl
 
     @Inject
-    lateinit var playerData: PlayerDataImpl
+    lateinit var playerData: PlayerEvents
 
     @Inject
     lateinit var player: ExoPlayer
@@ -95,6 +94,7 @@ class MusicService : MediaBrowserServiceCompat() {
 
     inner class MediaQueueNavigator : TimelineQueueNavigator(mediaSession) {
         override fun getMediaDescription(player: Player, windowIndex: Int): MediaDescriptionCompat {
+            playerData.playList.value[windowIndex].toMediaMetaData()
             TODO()
 //            return playerData.playList.value.order[windowIndex].toMediaMetaData()!!.description
         }

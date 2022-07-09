@@ -54,7 +54,8 @@ fun TimeLine(
     LaunchedEffect(interactionSource) {
         suspend fun end() {
             previousInteraction = InteractionType.None
-            seekBarUseCase.invoke(seekBar)
+            val current = (duration.value * seekBar).toLong()
+            seekBarUseCase(current)
             changeByUser = false
         }
         interactionSource.interactions.collectLatest {

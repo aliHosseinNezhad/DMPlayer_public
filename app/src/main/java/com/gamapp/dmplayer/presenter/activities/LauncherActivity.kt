@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.gamapp.data.db.ApplicationDatastore
 import com.gamapp.data.db.PlayerDatastore
+import com.gamapp.dmplayer.framework.ActivityResultRegisterProvider
 import com.gamapp.dmplayer.framework.service.MusicService
 import com.gamapp.dmplayer.presenter.ui.navigation.SetUpNavigation
 import com.gamapp.dmplayer.presenter.ui.screen.PermissionScreen
@@ -31,8 +32,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 
+
 @AndroidEntryPoint
 class LauncherActivity : ComponentActivity() {
+
 
     @Inject
     lateinit var playerConnection: PlayerConnection
@@ -40,12 +43,16 @@ class LauncherActivity : ComponentActivity() {
     @Inject
     lateinit var io: ApplicationDatastore
 
+    @Inject
+    lateinit var registerProvider: ActivityResultRegisterProvider
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setupPlayer(playerConnection)
         startMusicService()
         setupWindowsInsets()
+        registerProvider.setup(this)
 
         setContent {
             PlayerTheme {
@@ -69,7 +76,7 @@ class LauncherActivity : ComponentActivity() {
         }
     }
 
-    private fun startMusicService(){
+    private fun startMusicService() {
         val intent = Intent(this, MusicService::class.java)
         startService(intent)
         setupWindowsInsets()

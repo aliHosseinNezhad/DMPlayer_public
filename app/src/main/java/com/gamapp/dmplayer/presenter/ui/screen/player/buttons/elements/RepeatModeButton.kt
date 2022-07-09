@@ -63,6 +63,7 @@ fun RepeatModeButton(
                                     speed = 1f
                                     playAnimation()
                                 }
+                                else -> {}
                             }
                         }
 
