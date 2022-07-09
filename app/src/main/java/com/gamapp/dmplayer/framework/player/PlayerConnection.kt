@@ -20,7 +20,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 
-
 @Singleton
 class PlayerConnectionImpl @Inject constructor(
     private val musicServiceConnection: MusicServiceConnection
@@ -85,6 +84,22 @@ class PlayerConnectionImpl @Inject constructor(
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        when (event.targetState) {
+            Lifecycle.State.INITIALIZED -> {
 
+            }
+            Lifecycle.State.CREATED -> {
+
+            }
+            Lifecycle.State.STARTED -> {
+
+            }
+            Lifecycle.State.RESUMED -> {
+
+            }
+            Lifecycle.State.DESTROYED -> {
+
+            }
+        }
     }
 }

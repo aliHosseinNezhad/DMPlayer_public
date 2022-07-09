@@ -1,5 +1,7 @@
 package com.gamapp.domain.usecase.player
 
+import javax.inject.Inject
+
 
 //import com.gamapp.domain.player_interface.PlayerConnector
 //import com.gamapp.domain.player_interface.PlayerData
@@ -7,6 +9,8 @@ package com.gamapp.domain.usecase.player
 //
 //
 //
-interface PlayPauseUseCase {
-    suspend operator fun invoke()
+class PlayPauseUseCase @Inject constructor(){
+    suspend operator fun invoke(){
+
+    }
 }
