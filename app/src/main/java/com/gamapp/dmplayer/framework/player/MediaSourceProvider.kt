@@ -2,11 +2,15 @@ package com.gamapp.dmplayer.framework.player
 
 import android.content.ContentUris
 import android.net.Uri
+import android.os.Bundle
 import android.provider.MediaStore
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import androidx.core.net.toUri
+import com.gamapp.domain.mapper.bundle
+import com.gamapp.domain.mapper.getTrackModel
+import com.gamapp.domain.models.BaseTrack
 import com.gamapp.domain.models.TrackModel
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
@@ -20,30 +24,34 @@ fun Long.toMusicUri(): Uri {
     )
 }
 
-fun TrackModel.toMediaMetaData(): MediaMetadataCompat? {
+fun TrackModel.toMediaMetaData(): MediaMetadataCompat {
     return MediaMetadataCompat.Builder()
-        .putString(
-            MediaMetadataCompat.METADATA_KEY_MEDIA_ID, id.toString()
-        )
-        .putString(
-            MediaMetadataCompat.METADATA_KEY_MEDIA_URI,
-            id.toMusicUri().toString()
-        )
+        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, id.toString())
+        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, id.toMusicUri().toString())
         .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
         .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, subtitle)
-        .putString(
-            MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE,
-            title
-        )
-        .putString(
-            MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE,
-            subtitle
-        )
-        .putString(
-            MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION,
-            subtitle
-        )
+        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, title)
+        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, subtitle)
+        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI,id.toMusicUri().toString())
+        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, subtitle)
+        .putString(MediaMetadataCompat.METADATA_KEY_DURATION, duration.toString())
+        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
+        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, artist)
         .build()
+}
+
+fun TrackModel.toMediaDescription():MediaDescriptionCompat {
+    return MediaDescriptionCompat.Builder()
+        .setMediaId(id.toString())
+        .setTitle(title)
+        .setSubtitle(subtitle)
+        .setMediaUri(id.toMusicUri())
+        .setExtras(bundle())
+        .build()
+}
+
+fun MediaDescriptionCompat.toTrackModel(): TrackModel? {
+    return this.extras.getTrackModel()
 }
 
 fun MediaMetadataCompat.toMediaItem(): MediaBrowserCompat.MediaItem {

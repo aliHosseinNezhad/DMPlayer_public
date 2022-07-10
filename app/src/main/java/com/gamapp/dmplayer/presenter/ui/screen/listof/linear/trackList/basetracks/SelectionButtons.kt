@@ -84,7 +84,7 @@ fun BoxScope.TrackSelectionButtons(
                     val playList = manager.selectionList
                     if (playList.isNotEmpty()) {
                         scope.launch {
-                            viewModel.setAndPlay(playList, playList.first())
+                            viewModel.playerInteracts.setPlayListAndPlay(playList, playList.first())
                             exitSelection()
                         }
                     }

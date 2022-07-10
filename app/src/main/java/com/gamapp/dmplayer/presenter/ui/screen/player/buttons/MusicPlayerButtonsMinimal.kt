@@ -24,8 +24,8 @@ import com.gamapp.dmplayer.presenter.ui.screen.player.Expanded
 import com.gamapp.dmplayer.presenter.ui.screen.player.MinimalMusicDetails
 import com.gamapp.dmplayer.presenter.ui.screen.player.MinimalPlayerHeight
 import com.gamapp.dmplayer.presenter.ui.screen.player.PlayerState
-import com.gamapp.dmplayer.presenter.ui.screen.player.buttons.elements.FastForward
-import com.gamapp.dmplayer.presenter.ui.screen.player.buttons.elements.FastRewindButton
+import com.gamapp.dmplayer.presenter.ui.screen.player.buttons.elements.SkipToNextButton
+import com.gamapp.dmplayer.presenter.ui.screen.player.buttons.elements.SkipToBackButton
 import com.gamapp.dmplayer.presenter.ui.screen.player.buttons.elements.PlayPauseButton
 import com.gamapp.dmplayer.presenter.viewmodel.musicplayer.PlayerViewModel
 import kotlinx.coroutines.delay
@@ -82,27 +82,29 @@ fun MinimalButtons(clickable: State<Boolean>, state: PlayerState) {
             .fillMaxHeight(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        FastRewindButton(
+        SkipToBackButton(
             modifier = Modifier
                 .size(45.dp)
                 .align(CenterVertically),
             clickable = clickable,
-            rewindUseCase = player.playerInteracts.fastRewindUseCase
+            skipToPreviousUseCase = player.playerInteracts.skipToPrevious,
+            rewindUseCase = player.playerInteracts.rewind
         )
         PlayPauseButton(
             modifier = Modifier
                 .size(45.dp)
                 .align(CenterVertically),
             isPlaying = isPlaying,
-            playPauseUseCase = player.playerInteracts.playPauseUseCase,
+            playPauseUseCase = player.playerInteracts.playPause,
             clickable = clickable
         )
-        FastForward(
+        SkipToNextButton(
             modifier = Modifier
                 .size(45.dp)
                 .align(CenterVertically),
             clickable = clickable,
-            fastForwardUseCase = player.playerInteracts.fastForwardUseCase
+            skipToNextUseCase = player.playerInteracts.skipToNext,
+            forwardUseCase = player.playerInteracts.forward
         )
         CustomIconButton(
             enabled = clickable.value,

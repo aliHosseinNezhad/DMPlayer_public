@@ -25,6 +25,4 @@ class CategoryViewModel @Inject constructor(
     val artistInteracts: ArtistInteracts,
     val queueInteracts: QueueInteracts
 ) : BaseViewModel(application), QueueRepository by queueRepository,
-    AlbumRepository by albumRepository, ArtistRepository by artistRepository {
-
-}
+    AlbumRepository by albumRepository, ArtistRepository by artistRepository

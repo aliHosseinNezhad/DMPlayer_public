@@ -5,11 +5,12 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.gamapp.dmplayer.presenter.ui.screen.dialog.add_musics_to_queues_dialog.AddMusicsToQueuesDialog
+import com.gamapp.domain.models.BaseTrack
 import com.gamapp.domain.models.BaseTrackModel
 import com.gamapp.domain.models.TrackModel
 
 data class AddToQueueDialogData(
-    val tracks: List<TrackModel>,
+    val tracks: List<BaseTrack>,
     val finish: () -> Unit
 ) : DialogEvent.Visible()
 

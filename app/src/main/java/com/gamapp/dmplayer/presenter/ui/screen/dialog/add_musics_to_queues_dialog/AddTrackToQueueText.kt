@@ -14,10 +14,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gamapp.dmplayer.presenter.ui.theme.onContent
 import com.gamapp.dmplayer.presenter.ui.theme.onDialog
+import com.gamapp.domain.models.BaseTrack
 import com.gamapp.domain.models.TrackModel
 
 @Composable
-fun AddTrackToQueueText(tracks: List<TrackModel>) {
+fun AddTrackToQueueText(tracks: List<BaseTrack>) {
     val dialog = if (tracks.size > 1)
         "${tracks.size} Tracks"
     else "Track"

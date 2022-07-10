@@ -34,12 +34,13 @@ import com.gamapp.dmplayer.presenter.utils.navigationBarHeight
 import com.gamapp.dmplayer.presenter.utils.statusBarHeight
 import com.gamapp.dmplayer.presenter.viewmodel.TrackDetailViewModel
 import com.gamapp.domain.ACTIONS
+import com.gamapp.domain.models.BaseTrack
 import com.gamapp.domain.models.TrackModel
 import com.gamapp.domain.utils.toTimeFormat
 
 
 @Composable
-fun TrackDetails(track: TrackModel, nav: NavHostController) {
+fun TrackDetails(track: BaseTrack, nav: NavHostController) {
     var editable by remember {
         mutableStateOf(false)
     }

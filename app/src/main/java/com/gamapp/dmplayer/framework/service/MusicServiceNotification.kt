@@ -10,8 +10,8 @@ import androidx.compose.ui.graphics.toArgb
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import com.gamapp.dmplayer.Constant.NOTIFICATION_CHANNEL_ID
-import com.gamapp.dmplayer.Constant.NOTIFICATION_ID
+import com.gamapp.domain.Constant.NOTIFICATION_CHANNEL_ID
+import com.gamapp.domain.Constant.NOTIFICATION_ID
 import com.gamapp.dmplayer.R
 import com.gamapp.dmplayer.presenter.ui.theme.primary
 import com.google.android.exoplayer2.Player

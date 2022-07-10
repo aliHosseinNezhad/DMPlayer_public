@@ -9,24 +9,26 @@ import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ActivityScoped
 import dagger.hilt.android.scopes.ViewModelScoped
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 
 @Module
-@InstallIn(ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
     @Binds
-    @ViewModelScoped
+    @Singleton
     abstract fun bindSearchRepository(searchRepositoryImpl: SearchRepositoryImpl)
             : SearchRepository
 
-    @ViewModelScoped
+    @Singleton
     @Binds
     abstract fun bindQueueRepository(
         queueRepositoryImp: QueueRepositoryImp
     ): QueueRepository
 
 
-    @ViewModelScoped
+    @Singleton
     @Binds
     abstract fun bindFavoriteRepository(
         favoriteRepositoryImp: FavoriteRepositoryImp
@@ -34,14 +36,14 @@ abstract class RepositoryModule {
 
 
     @Binds
-    @ViewModelScoped
+    @Singleton
     abstract fun provideTrackRepository(trackRepositoryImpl: TrackRepositoryImpl): TrackRepository
 
     @Binds
-    @ViewModelScoped
+    @Singleton
     abstract fun provideAlbumRepository(albumRepository: AlbumRepositoryImpl): AlbumRepository
 
     @Binds
-    @ViewModelScoped
+    @Singleton
     abstract fun provideArtistRepository(artistRepository: ArtistRepositoryImpl): ArtistRepository
 }

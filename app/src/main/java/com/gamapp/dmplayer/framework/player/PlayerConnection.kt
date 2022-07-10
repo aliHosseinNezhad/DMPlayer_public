@@ -1,105 +1,133 @@
 package com.gamapp.dmplayer.framework.player
 
+import android.app.Activity
+import android.content.ComponentName
+import android.content.Context
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.session.MediaControllerCompat
+import android.util.Log
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.asFlow
-import com.gamapp.dmplayer.Constant
-import com.gamapp.dmplayer.framework.service.MusicControllerConnectionState
-import com.gamapp.dmplayer.framework.service.MusicServiceConnection
-import com.gamapp.domain.models.BaseTrackModel
+import com.gamapp.dmplayer.framework.service.MusicService
+import com.gamapp.dmplayer.framework.service.MusicSource
 import com.gamapp.domain.player_interface.PlayerConnection
-import com.gamapp.domain.player_interface.PlayerController
-import com.gamapp.domain.player_interface.PlayerEvents
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
+import com.gamapp.domain.usecase.data.tracks.GetTracksByIdUseCase
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import javax.inject.Inject
 import javax.inject.Singleton
 
 
-@Singleton
 class PlayerConnectionImpl @Inject constructor(
-    private val musicServiceConnection: MusicServiceConnection
+    @ApplicationContext val context: Context,
+    private val musicSource: MusicSource,
+    private val getTracksByIdUseCase: GetTracksByIdUseCase,
 ) : PlayerConnection {
-    private val mediaController: MediaControllerCompat? get() = musicServiceConnection.mediaController
-    private val job = SupervisorJob()
-    private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
-    override val controllers: PlayerControllerImpl = PlayerControllerImpl {
-        mediaController?.transportControls
-    }
-    override val playerEvents: PlayerDataImpl = PlayerDataImpl()
-    private val subscriptionCallback = object : MediaBrowserCompat.SubscriptionCallback() {
-        override fun onChildrenLoaded(
-            parentId: String,
-            children: MutableList<MediaBrowserCompat.MediaItem>
-        ) {
-            coroutineScope.launch {
-                val ids = children.mapNotNull { mediaItem ->
-                    val id = try {
-                        mediaItem.mediaId?.toLong()
-                    } catch (e: NumberFormatException) {
-                        null
-                    }
-                    if (id != null)
-                        BaseTrackModel(
-                            id = id,
-                            title = mediaItem.description.title.toString(),
-                            subtitle = mediaItem.description.subtitle.toString()
-                        )
-                    else null
-                }
-                TODO()
-//                callback.currentPlayList tryEmit ids
+    private var mediaBrowser: MediaBrowserCompat? = null
+    private var currentActivity: Activity? = null
+    private val mediaController: MediaControllerCompat?
+        get() = run {
+            currentActivity?.let {
+                MediaControllerCompat.getMediaController(it)
             }
         }
+
+    override fun <T> setup(activity: T) where T : Activity, T : LifecycleOwner {
+        activity.lifecycle.addObserver(this)
+        currentActivity = activity
     }
 
-    init {
-        musicServiceConnection.subscribe(
-            Constant.MUSIC_SERVICE_ROOT_ID,
-            subscriptionCallback
-        )
-        coroutineScope.launch {
-            musicServiceConnection.connectionState.asFlow().collectLatest {
-                if (it is MusicControllerConnectionState.Connected) {
-                    val controller = musicServiceConnection.mediaController
-                    if (controller != null) {
-                        playerEvents.register(controller)
-                    }
+    val mediaControllerCallback = object : MediaControllerCompat.Callback() {
+        override fun onSessionDestroyed() {
+            mediaBrowser?.disconnect()
+            // maybe schedule a reconnection using a new MediaBrowser instance
+        }
+    }
+    private val mediaBrowserConnectionCallback = object : MediaBrowserCompat.ConnectionCallback() {
+        override fun onConnected() {
+            Log.i(TAG, "onConnected: ")
+            mediaBrowser?.sessionToken?.also { token ->
+                // Create a MediaControllerCompat
+                val activity = currentActivity
+                if (activity != null) {
+                    val mediaController = MediaControllerCompat(
+                        context, // Context
+                        token
+                    )
+                    mediaController.registerCallback(mediaControllerCallback)
+                    playerEvents.register(mediaController)
+                    MediaControllerCompat.setMediaController(activity, mediaController)
                 }
             }
         }
+
+        override fun onConnectionSuspended() {
+
+        }
+
+        override fun onConnectionFailed() {
+
+        }
     }
 
-    fun close() {
-        val c = mediaController
-        musicServiceConnection.unsubscribe(Constant.MUSIC_SERVICE_ROOT_ID, subscriptionCallback)
-        if (c != null) {
-            playerEvents.unregister(c)
+    override val playerEvents: PlayerEventImpl =
+        PlayerEventImpl(getTracksByIdUseCase = getTracksByIdUseCase,
+            _controller = {
+                mediaController
+            })
+    override val controllers: PlayerControllerImpl =
+        PlayerControllerImpl(
+            musicSource = musicSource,
+            playerEvents = playerEvents,
+            _controller = {
+                mediaController
+            })
+
+    private var scope: CoroutineScope? = null
+        set(value) {
+            playerEvents.scope = value
+            controllers.scope = value
+            field = value
         }
-        coroutineScope.cancel()
-    }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event.targetState) {
-            Lifecycle.State.INITIALIZED -> {
-
-            }
             Lifecycle.State.CREATED -> {
-
+                val job = SupervisorJob()
+                scope = CoroutineScope(Dispatchers.Main + job)
+                mediaBrowser = MediaBrowserCompat(
+                    context,
+                    ComponentName(
+                        context,
+                        MusicService::class.java
+                    ),
+                    mediaBrowserConnectionCallback,
+                    null
+                )
             }
             Lifecycle.State.STARTED -> {
-
-            }
-            Lifecycle.State.RESUMED -> {
-
+                mediaBrowser?.let {
+                    if (!it.isConnected)
+                        it.connect()
+                }
             }
             Lifecycle.State.DESTROYED -> {
-
+                mediaController?.let {
+                    it.unregisterCallback(mediaControllerCallback)
+                    playerEvents.unregister(it)
+                }
+                mediaBrowser?.let {
+                    if (it.isConnected)
+                        it.disconnect()
+                }
+                currentActivity = null
+                scope?.cancel()
+                scope = null
             }
+            else -> {}
         }
     }
 }

@@ -2,6 +2,7 @@ package com.gamapp.dmplayer.presenter.ui.navigation
 
 import com.gamapp.dmplayer.R
 import com.gamapp.dmplayer.presenter.ui.navigation.nav_ext.Route
+import com.gamapp.domain.models.BaseTrack
 import com.gamapp.domain.models.TrackModel
 import kotlinx.parcelize.Parcelize
 
@@ -49,5 +50,5 @@ data class ArtistsBySearchRoute(
 
 @Parcelize
 data class TrackDetailsRoute(
-    val track:TrackModel
+    val track:BaseTrack
 ) : Route()

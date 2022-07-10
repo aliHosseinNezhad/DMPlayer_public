@@ -39,10 +39,7 @@ class PlayerViewModel @Inject constructor(
     TrackPlayerModel by trackPlayerModel {
 
 
-    suspend fun setUpWithTrack(context: Context, baseTrack: BaseTrack?) {
-        val track = if (baseTrack != null) {
-            getTracksByIdUseCase(baseTrack.id)
-        } else null
+    suspend fun setUpWithTrack(context: Context, track: BaseTrack?) {
         if (track != null) {
             trackPlayerModel.musicModel.value = TrackPlayModel(
                 id = track.id,

@@ -37,7 +37,7 @@ fun CategoryTracks(
         },
         onItemClicked = { item ->
             scope.launch {
-                viewModel.setAndPlay(tracks, item)
+                viewModel.playerInteracts.setPlayListAndPlay(tracks, item)
             }
         },
         other = {

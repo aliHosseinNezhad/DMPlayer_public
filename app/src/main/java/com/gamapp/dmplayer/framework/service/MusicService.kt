@@ -2,22 +2,20 @@ package com.gamapp.dmplayer.framework.service
 
 import android.app.PendingIntent
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
-import android.os.ResultReceiver
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
+import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
+import android.util.Log
 import androidx.media.MediaBrowserServiceCompat
-import com.gamapp.dmplayer.Constant
-import com.gamapp.dmplayer.framework.player.PlayerDataImpl
-import com.gamapp.dmplayer.framework.player.toMediaItem
-import com.gamapp.dmplayer.framework.player.toMediaMetaData
+import com.gamapp.domain.Constant
+import com.gamapp.domain.Constant.NETWORK_ERROR
+import com.gamapp.dmplayer.framework.service.callback.MusicPlaybackPreparer
 import com.gamapp.domain.ACTIONS
 import com.gamapp.domain.mediaStore.MediaStoreChangeHandler
-import com.gamapp.domain.player_interface.PlayerEvents
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
@@ -27,6 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
+const val TAG = "MusicServiceTAG"
 
 @AndroidEntryPoint
 class MusicService : MediaBrowserServiceCompat() {
@@ -45,16 +44,19 @@ class MusicService : MediaBrowserServiceCompat() {
     private var playerHandler: Handler? = null
     private var mediaCategoryObserver: MediaCategoryObserver? = null
 
-    @Inject
-    lateinit var defaultMediaSourceFactory: DefaultDataSource.Factory
+    lateinit var playbackPreparer: MusicPlaybackPreparer
 
+    private var isPlayerInitialized = false
 
     @Inject
-    lateinit var playerData: PlayerEvents
+    lateinit var dataSourceFactory: DefaultDataSource.Factory
+
 
     @Inject
     lateinit var player: ExoPlayer
 
+    @Inject
+    lateinit var musicSource: MusicSource
 
     override fun onCreate() {
         super.onCreate()
@@ -70,11 +72,16 @@ class MusicService : MediaBrowserServiceCompat() {
             contentResolver = contentResolver,
             mediaCategoryObserver = mediaCategoryObserver!!
         )
-
-
         mediaSession = MediaSessionCompat(applicationContext, Constant.MEDIA_SESSION_TAG).apply {
             setSessionActivity(activityIntent)
             isActive = true
+        }
+        playbackPreparer = MusicPlaybackPreparer { playWhenReady, current ->
+            preparePlayer(
+                musicSource.songs,
+                current,
+                playWhenReady
+            )
         }
         sessionToken = mediaSession.sessionToken
         musicNotificationManager = MusicServiceNotification(
@@ -82,60 +89,18 @@ class MusicService : MediaBrowserServiceCompat() {
             sessionToken = mediaSession.sessionToken,
             notificationListener = MusicPlayerNotificationListener(this)
         )
-
-        mediaSessionConnector = MediaSessionConnector(mediaSession)
-        mediaSessionConnector.setPlayer(player)
-//        mediaSessionConnector.setPlaybackPreparer()
-        mediaSessionConnector.setQueueNavigator(MediaQueueNavigator())
         musicNotificationManager.setPlayer(player)
-//        playerAccessManager.onCreate(player = player, serviceScope = serviceScope)
-//        playerData.onCreate(serviceScope = serviceScope, player = player)
+        mediaSessionConnector = MediaSessionConnector(mediaSession)
+        mediaSessionConnector.setPlaybackPreparer(playbackPreparer)
+        mediaSessionConnector.setPlayer(player)
+        mediaSessionConnector.setQueueNavigator(MediaQueueNavigator())
     }
 
     inner class MediaQueueNavigator : TimelineQueueNavigator(mediaSession) {
         override fun getMediaDescription(player: Player, windowIndex: Int): MediaDescriptionCompat {
-            playerData.playList.value[windowIndex].toMediaMetaData()
-            TODO()
-//            return playerData.playList.value.order[windowIndex].toMediaMetaData()!!.description
+            return musicSource.songs[windowIndex]
         }
     }
-
-    private class MyPlaybackPreparer :
-        MediaSessionConnector.PlaybackPreparer {
-        override fun onCommand(
-            player: Player,
-            command: String,
-            extras: Bundle?,
-            cb: ResultReceiver?
-        ): Boolean {
-            TODO("Not yet implemented")
-        }
-
-        override fun getSupportedPrepareActions(): Long {
-            TODO("Not yet implemented")
-        }
-
-        override fun onPrepare(playWhenReady: Boolean) {
-            TODO("Not yet implemented")
-        }
-
-        override fun onPrepareFromMediaId(
-            mediaId: String,
-            playWhenReady: Boolean,
-            extras: Bundle?
-        ) {
-            TODO("Not yet implemented")
-        }
-
-        override fun onPrepareFromSearch(query: String, playWhenReady: Boolean, extras: Bundle?) {
-            TODO("Not yet implemented")
-        }
-
-        override fun onPrepareFromUri(uri: Uri, playWhenReady: Boolean, extras: Bundle?) {
-            TODO("Not yet implemented")
-        }
-    }
-
 
     override fun onGetRoot(
         clientPackageName: String,
@@ -148,29 +113,51 @@ class MusicService : MediaBrowserServiceCompat() {
         result: Result<MutableList<MediaBrowserCompat.MediaItem>>
     ) {
         if (parentId == Constant.MUSIC_SERVICE_ROOT_ID) {
-            result.detach()
-            serviceScope.launch {
-//                playerData.playList.collect {
-//                    it.order.mapNotNull { track ->
-//                        track.toMediaMetaData()?.toMediaItem()
-//                    }.let { mediaItems ->
-//                        try {
-//                            result.sendResult(mediaItems.toMutableList())
-//                        } catch (e: Exception) {
-//
-//                        }
-//                    }
-//                }
+            val resultsSent = musicSource.whenReady { isInitialized ->
+                if (isInitialized) {
+                    result.sendResult(musicSource.asMediaItems())
+                    if (!isPlayerInitialized && musicSource.songs.isNotEmpty()) {
+                        preparePlayer(musicSource.songs, musicSource.songs[0], false)
+                        isPlayerInitialized = true
+                    }
+                } else {
+                    mediaSession.sendSessionEvent(NETWORK_ERROR, null)
+                    result.sendResult(null)
+                }
             }
-        } else {
-            result.sendResult(null)
+            if (!resultsSent) {
+                result.detach()
+            }
         }
     }
 
+    private fun findCurrentIndex(
+        itemToPlay: MediaDescriptionCompat?,
+        songs: List<MediaDescriptionCompat>
+    ): Int {
+        for (i in songs.indices) {
+            if (itemToPlay?.mediaId == songs[i].mediaId)
+                return i
+        }
+        return 0
+    }
+
+    private fun preparePlayer(
+        songs: List<MediaDescriptionCompat>,
+        itemToPlay: MediaDescriptionCompat?,
+        playNow: Boolean
+    ) {
+        if (songs.isEmpty()) return
+        val index = findCurrentIndex(itemToPlay = itemToPlay, songs = songs)
+        player.setMediaSource(musicSource.asMediaSource(dataSourceFactory))
+        player.seekTo(index, 0L)
+        player.prepare()
+        player.playWhenReady = playNow
+    }
+
+
     override fun onDestroy() {
         super.onDestroy()
-//        playerAccessManager.onDestroy()
-//        playerData.onDestroy()
         musicNotificationManager.setPlayer(null)
         serviceScope.cancel()
         player.release()

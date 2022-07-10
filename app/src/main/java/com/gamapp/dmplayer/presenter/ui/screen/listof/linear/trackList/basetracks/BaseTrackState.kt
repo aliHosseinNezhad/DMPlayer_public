@@ -134,7 +134,7 @@ class BaseTrackState(private val viewModel: AppViewModel) :
                 onPlay = {
                     if (items.isNotEmpty()) {
                         scope.launch {
-                            viewModel.setAndPlay(items, items.first())
+                            viewModel.playerInteracts.setPlayListAndPlay(items, items.first())
                         }
                     }
                 },
@@ -143,7 +143,7 @@ class BaseTrackState(private val viewModel: AppViewModel) :
                         scope.launch {
                             val index =
                                 Random(System.currentTimeMillis()).nextInt(0, items.size)
-                            viewModel.setAndPlay(items, items[index])
+                            viewModel.playerInteracts.setPlayListAndPlay(items, items[index])
                         }
                     }
                 })

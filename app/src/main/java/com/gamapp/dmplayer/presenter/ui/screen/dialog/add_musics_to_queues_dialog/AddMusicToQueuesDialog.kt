@@ -35,6 +35,7 @@ import com.gamapp.dmplayer.presenter.ui.screen.dialog.removeClick
 import com.gamapp.dmplayer.presenter.ui.screen.elements.DialogQueueItem
 import com.gamapp.dmplayer.presenter.ui.theme.*
 import com.gamapp.dmplayer.presenter.viewmodel.QueueViewModel
+import com.gamapp.domain.models.BaseTrack
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -44,7 +45,7 @@ import java.util.concurrent.Executors
 @Composable
 fun AddMusicsToQueuesDialog(
     show: Boolean,
-    tracks: List<TrackModel>,
+    tracks: List<BaseTrack>,
     finish: () -> Unit,
 ) {
     val animation = updateTransition(targetState = show, label = "transition").animateFloat(
@@ -120,7 +121,7 @@ fun AddMusicsToQueuesDialog(
                                 queueList.filter { it.default }.map {
                                     it to {
                                         ioScope.launch {
-                                            viewModel.queueInteracts.addTrack.invoke(it.id, tracks)
+                                            viewModel.queueInteracts.addTrack(it.id, tracks)
                                         }
                                     }
                                 }
@@ -131,7 +132,7 @@ fun AddMusicsToQueuesDialog(
                                queueList.filter { !it.default }.map {
                                    it to {
                                        ioScope.launch {
-                                           viewModel.queueInteracts.addTrack.invoke(it.id, tracks)
+                                           viewModel.queueInteracts.addTrack(it.id, tracks)
                                        }
                                    }
                                }

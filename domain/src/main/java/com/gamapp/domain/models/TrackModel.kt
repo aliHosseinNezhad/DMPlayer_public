@@ -1,8 +1,10 @@
 package com.gamapp.domain.models
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import com.gamapp.graphics.R
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 val TrackModel.Companion.Empty
     get() = TrackModel(
@@ -18,18 +20,19 @@ val TrackModel.Companion.Empty
         duration = 0
     )
 
+@Keep
 @Parcelize
 data class TrackModel(
-    val fileName: String,
+    override val fileName: String,
     override val id: Long,
     override val title: String,
-    val artist: String,
-    val album: String,
-    val duration: Int,
+    override val artist: String,
+    override val album: String,
+    override val dateAdded: Long,
+    override val duration: Int,
     val size: Int,
     val albumId: Long,
     val artistId: Long,
-    val dateAdded: Long,
 ) : BaseTrack, Parcelable {
     override val subtitle: String get() = artist
     override val defaultImage: Int get() = R.drawable.ic_track

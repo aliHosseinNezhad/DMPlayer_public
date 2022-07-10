@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,21 +34,23 @@ fun MusicPlayerButtons(
             shuffleUseCase = playViewModel.playerInteracts.shuffleUseCase,
             shuffle = shuffle
         )
-        FastRewindButton(
+        SkipToBackButton(
             modifier = Modifier.requiredSize(60.dp),
             clickable = clickable,
-            rewindUseCase = playViewModel.playerInteracts.fastRewindUseCase
+            skipToPreviousUseCase = playViewModel.playerInteracts.skipToPrevious,
+            rewindUseCase = playViewModel.playerInteracts.rewind
         )
         PlayPauseButton(
             modifier = Modifier.requiredSize(60.dp),
             isPlaying = isPlaying,
-            playPauseUseCase = playViewModel.playerInteracts.playPauseUseCase,
+            playPauseUseCase = playViewModel.playerInteracts.playPause,
             clickable = clickable
         )
-        FastForward(
+        SkipToNextButton(
             modifier = Modifier.requiredSize(60.dp),
             clickable = clickable,
-            fastForwardUseCase = playViewModel.playerInteracts.fastForwardUseCase
+            skipToNextUseCase = playViewModel.playerInteracts.skipToNext,
+            forwardUseCase = playViewModel.playerInteracts.forward
         )
         RepeatModeButton(
             modifier = Modifier.requiredSize(60.dp),

@@ -2,6 +2,7 @@ package com.gamapp.dmplayer.presenter.ui.navigation
 
 import androidx.navigation.NavHostController
 import com.gamapp.dmplayer.presenter.ui.navigation.nav_ext.navigateTo
+import com.gamapp.domain.models.BaseTrack
 import com.gamapp.domain.models.TrackModel
 
 
@@ -33,6 +34,6 @@ fun NavHostController.toArtistsBySearch(text: String) {
     this.navigateTo(ArtistsBySearchRoute(text))
 }
 
-fun NavHostController.toTrackDetails(track: TrackModel) {
+fun NavHostController.toTrackDetails(track: BaseTrack) {
     navigateTo(TrackDetailsRoute(track))
 }

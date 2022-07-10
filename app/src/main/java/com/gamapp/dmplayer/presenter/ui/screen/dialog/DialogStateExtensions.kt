@@ -1,6 +1,7 @@
 package com.gamapp.dmplayer.presenter.ui.screen.dialog
 
 import com.gamapp.dmplayer.presenter.ui.screen.dialog.defaults.*
+import com.gamapp.domain.models.BaseTrack
 import com.gamapp.domain.models.BaseTrackModel
 import com.gamapp.domain.models.TrackModel
 
@@ -31,7 +32,7 @@ fun DialogsState.showRemoveTrackDialog(
 }
 
 
-fun DialogsState.showAddToQueueDialog(tracks: List<TrackModel>, finish: () -> Unit) {
+fun DialogsState.showAddToQueueDialog(tracks: List<BaseTrack>, finish: () -> Unit) {
     show(
         AddToQueueDialogData(
             tracks = tracks,

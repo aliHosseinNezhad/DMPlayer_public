@@ -3,7 +3,7 @@ package com.gamapp.dmplayer.framework.service
 import android.app.Notification
 import android.content.Intent
 import androidx.core.content.ContextCompat
-import com.gamapp.dmplayer.Constant.NOTIFICATION_ID
+import com.gamapp.domain.Constant.NOTIFICATION_ID
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 
 class MusicPlayerNotificationListener constructor(

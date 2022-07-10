@@ -26,16 +26,16 @@ object MediaStoreDataSourceModule {
 }
 
 @Module
-@InstallIn(ActivityRetainedComponent::class)
+@InstallIn(SingletonComponent::class)
 object MediaStoreActivityRetainedModule {
 
-    @ActivityRetainedScoped
+    @Singleton
     @Provides
     fun provideRemoveTracks(source: MediaStoreRemoveTracksDataSourceImpl): MediaStoreRemoveTracksDataSource {
         return source
     }
 
-    @ActivityRetainedScoped
+    @Singleton
     @Provides
     fun provideUpdateTracks(source: MediaStoreUpdateTrackDataSourceImpl): MediaStoreUpdateTrackDataSource = source
 }

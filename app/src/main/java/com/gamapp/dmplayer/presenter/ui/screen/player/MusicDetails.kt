@@ -29,6 +29,16 @@ fun MusicDetails(
             true
         }
     }
+    val title = remember {
+        derivedStateOf {
+            screenData.title
+        }
+    }
+    val artist = remember {
+        derivedStateOf {
+            screenData.artist
+        }
+    }
     Column(
         modifier = Modifier
             .then(modifier)
@@ -38,7 +48,7 @@ fun MusicDetails(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         HideCornerText(
-            text = screenData.title,
+            text = title,
             center = true,
             color = MaterialTheme.colors.onBackground.copy(0.8f),
             enabled = enabled,
@@ -48,7 +58,7 @@ fun MusicDetails(
         )
         Spacer(modifier = Modifier.height(8.dp))
         HideCornerText(
-            text = screenData.artist,
+            text = artist,
             center = true,
             color = MaterialTheme.colors.onBackground.copy(ContentAlpha.medium),
             enabled = enabled,
@@ -68,6 +78,16 @@ fun MinimalMusicDetails(modifier: Modifier,viewModel: PlayerViewModel = hiltView
             true
         }
     }
+    val title = remember {
+        derivedStateOf {
+            screenData.title
+        }
+    }
+    val artist = remember {
+        derivedStateOf {
+            screenData.artist
+        }
+    }
     Column(
         modifier = Modifier
             .then(modifier)
@@ -76,7 +96,7 @@ fun MinimalMusicDetails(modifier: Modifier,viewModel: PlayerViewModel = hiltView
         horizontalAlignment = Alignment.Start
     ) {
         HideCornerText(
-            text = screenData.title,
+            text = title,
             center = false,
             color = Color.White,
             enabled = enabled,
@@ -85,7 +105,7 @@ fun MinimalMusicDetails(modifier: Modifier,viewModel: PlayerViewModel = hiltView
                 .requiredHeight(20.dp)
         )
         HideCornerText(
-            text = screenData.artist,
+            text = artist,
             center = false,
             color = Color.White.copy(ContentAlpha.medium),
             enabled = enabled,

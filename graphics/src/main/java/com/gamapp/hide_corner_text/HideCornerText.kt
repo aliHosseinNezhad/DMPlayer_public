@@ -34,14 +34,13 @@ data class TextData(
 
 @Composable
 fun HideCornerText(
-    text: String,
+    text: State<String>,
     center: Boolean,
     color: Color,
     enabled: State<Boolean>,
     modifier: Modifier = Modifier,
     state: HideCornerTextState = rememberHideCornerState()
 ) {
-    val currentText = rememberUpdatedState(newValue = text)
     val currentColor = rememberUpdatedState(newValue = color)
     val currentCenter = rememberUpdatedState(newValue = center)
     val lifecycle = LocalLifecycleOwner.current
@@ -63,19 +62,25 @@ fun HideCornerText(
         val width = constraints.value.maxWidth
         val height = constraints.value.maxHeight
         val scope = rememberCoroutineScope()
-        DisposableEffect(text, state, width, height, color, center) {
+        DisposableEffect(state, width, height, color, center) {
             ready = false
             if (state.animatable.isRunning) {
                 scope.launch {
-                    state.stop(text, color, width.toFloat(), height.toFloat(), center)
-                    delay(10)
-                    ready = true
+                    snapshotFlow { text.value }.collectLatest {
+                        ready = false
+                        state.stop(it, color, width.toFloat(), height.toFloat(), center)
+                        delay(10)
+                        ready = true
+                    }
                 }
             } else {
-                state.init(text, color, width.toFloat(), height.toFloat(), center)
                 scope.launch {
-                    delay(10)
-                    ready = true
+                    snapshotFlow { text.value }.collectLatest {
+                        ready = false
+                        state.init(it, color, width.toFloat(), height.toFloat(), center)
+                        delay(10)
+                        ready = true
+                    }
                 }
             }
             onDispose {}
@@ -94,7 +99,7 @@ fun HideCornerText(
                 Log.i(TAG, "HideCornerText: $it")
                 if (!it.enabledByUser || !it.resume) {
                     state.stop(
-                        currentText.value,
+                        text.value,
                         currentColor.value,
                         constraints.value.maxWidth.toFloat(),
                         constraints.value.maxHeight.toFloat(),
@@ -102,7 +107,7 @@ fun HideCornerText(
                     )
                 } else if (it.ready && it.enabledByUser && it.resume) {
                     state.animation(
-                        currentText.value,
+                        text.value,
                         currentColor.value,
                         constraints.value.maxWidth.toFloat(),
                         constraints.value.maxHeight.toFloat()
@@ -114,15 +119,15 @@ fun HideCornerText(
             val rect = this.drawContext.size.toRect().toAndroidRect()
             drawIntoCanvas {
                 with(it.nativeCanvas) {
-                    val textWidth = state.paint.measureText(text)
+                    val textWidth = state.paint.measureText(text.value)
                     val textHeight: Float = state.paint.descent() - state.paint.ascent()
                     val textOffset: Float = textHeight / 2f - state.paint.descent()
                     withClip(clipRect = rect) {
                         if (state.count + textWidth >= 0) {
                             drawText(
-                                text,
+                                text.value,
                                 0,
-                                text.length,
+                                text.value.length,
                                 1f * state.count,
                                 height / 2f + textOffset / 2f,
                                 state.paint
@@ -130,11 +135,11 @@ fun HideCornerText(
                         }
                         if (width < textWidth && width >= state.count + textWidth + width / 4)
                             drawText(
-                                text,
+                                text.value,
                                 0,
-                                text.length,
+                                text.value.length,
                                 1f * state.count + state.paint
-                                    .measureText(text) + width / 4,
+                                    .measureText(text.value) + width / 4,
                                 height / 2f + textOffset / 2f,
                                 state.paint
                             )

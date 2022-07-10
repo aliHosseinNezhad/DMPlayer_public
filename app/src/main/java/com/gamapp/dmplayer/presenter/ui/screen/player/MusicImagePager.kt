@@ -16,6 +16,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gamapp.dmplayer.presenter.ui.screen.ext.Ref
 import com.gamapp.dmplayer.presenter.ui.screen.ext.TrackPlayerScope
 import com.gamapp.dmplayer.presenter.viewmodel.musicplayer.PlayerViewModel
+import com.gamapp.domain.models.BaseTrack
 import com.gamapp.domain.models.BaseTrackModel
 import com.gamapp.domain.models.TrackModel
 import com.gamapp.pager.RecyclerHorizontalPager
@@ -70,7 +71,7 @@ fun TrackPlayerScope.TracksImagePager(
                 recyclerState.currentPageIndex.collect {
                     if (it.second && it.first != currentTrack)
                         scope.launch {
-                            viewModel.setPlayerListAndCurrent(it.first, tracks)
+                            viewModel.playerInteracts.setCurrentTrack(it.first)
                         }
                 }
             }
@@ -100,7 +101,7 @@ fun TrackPlayerScope.TracksImagePager(
 
 @Composable
 fun TrackImage(
-    trackModel: TrackModel,
+    trackModel: BaseTrack,
     bound: State<DpSize>,
     state: PlayerData,
     motionHeight: Ref<Int>,

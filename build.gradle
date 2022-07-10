@@ -15,8 +15,15 @@ buildscript {
 //        classpath Libs.Dagger.plugin
         classpath 'com.google.dagger:hilt-android-gradle-plugin:2.42'
     }
-}
 
+}
+plugins {
+//    id 'org.jetbrains.kotlin.jvm' version "${Versions.kotlin}"
+//    id 'org.jetbrains.kotlin.plugin.serialization' version "${Versions.kotlin}"
+
+    id 'org.jetbrains.kotlin.jvm' version '1.7.0' apply false
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.7.0' apply false
+}
 allprojects {
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         kotlinOptions {
@@ -38,6 +45,7 @@ allprojects {
         }
     }
 }
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }

@@ -2,33 +2,33 @@ package com.gamapp.dmplayer.presenter.ui.screen.player.buttons.elements
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.gamapp.custom.CustomIconButton
 import com.gamapp.dmplayer.presenter.ui.theme.white
-import com.gamapp.domain.usecase.player.FastForwardUseCase
+import com.gamapp.domain.usecase.player.RewindUseCase
+import com.gamapp.domain.usecase.player.SkipToPreviousUseCase
 import com.gamapp.graphics.R
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-
 @Composable
-fun FastForward(
+fun SkipToBackButton(
     modifier: Modifier,
     clickable: State<Boolean>,
-    fastForwardUseCase: FastForwardUseCase
+    skipToPreviousUseCase: SkipToPreviousUseCase,
+    rewindUseCase: RewindUseCase
 ) {
-    val forwardButtonInteractionSource = remember {
+    val rewindButtonInteractionSource = remember {
         MutableInteractionSource()
     }
     val scope = rememberCoroutineScope()
@@ -36,31 +36,26 @@ fun FastForward(
         enabled = clickable.value,
         onClick = {
             scope.launch {
-                fastForwardUseCase.invoke()
+                skipToPreviousUseCase.invoke()
             }
         },
         modifier = Modifier.then(modifier),
-        interactionSource = forwardButtonInteractionSource,
+        interactionSource = rewindButtonInteractionSource,
         onLongClick = {}
     ) {
-//        val pressed2 = forwardButtonInteractionSource.collectIsPressedAsState()
-//        LaunchedEffect(key1 = pressed2.value) {
-//            delay(300)
-//            while (pressed2.value) {
-//                delay(100)
-//                val x = playViewModel.currentPosition.value + 1000
-//                if (x < playViewModel.duration.value) {
-//                    playViewModel.seekTo(x)
-//
-//                } else {
-////                        if (playViewModel.nextMusic()) {
-////                            playViewModel.seekTo((0f).roundToInt())
-////                        } else break
-//                }
-//            }
-//        }
+        val pressed = rewindButtonInteractionSource.collectIsPressedAsState()
+        LaunchedEffect(Unit) {
+            snapshotFlow { pressed.value }.collectLatest {
+                var skip = 500L
+                while (it) {
+                    rewindUseCase(skip)
+                    delay(100)
+                    skip += 500
+                }
+            }
+        }
         Image(
-            painter = rememberVectorPainter(image = ImageVector.vectorResource(id = R.drawable.round_fast_forward_24)),
+            painter = rememberVectorPainter(image = ImageVector.vectorResource(id = R.drawable.round_fast_rewind_24)),
             contentDescription = null,
             modifier = Modifier
                 .padding(all = 10.dp)

@@ -7,6 +7,7 @@ import com.gamapp.data.data_source.media_store.remove.MediaStoreRemoveTracksData
 import com.gamapp.dmplayer.framework.ActivityResultRegisterProvider
 import com.gamapp.dmplayer.framework.utils.removeTracks
 import com.gamapp.dmplayer.framework.utils.removeTracksR
+import com.gamapp.domain.models.BaseTrack
 import com.gamapp.domain.models.TrackModel
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -17,13 +18,13 @@ class MediaStoreRemoveTracksDataSourceImpl @Inject constructor(
     private val activityRegisterProvider:ActivityResultRegisterProvider
 ) : MediaStoreRemoveTracksDataSource {
     override suspend fun removeTrack(
-        track: TrackModel,
+        track: BaseTrack,
     ) {
         removeTracks(listOf(track))
     }
 
     override suspend fun removeTracks(
-        tracks: List<TrackModel>,
+        tracks: List<BaseTrack>,
     ) {
         val registry = activityRegisterProvider.activityResultRegistry
         if (registry != null) {

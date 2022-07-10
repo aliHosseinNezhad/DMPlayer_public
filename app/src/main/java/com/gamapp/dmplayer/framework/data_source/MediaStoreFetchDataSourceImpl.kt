@@ -63,9 +63,7 @@ suspend inline fun MutableStateFlow<LiveTracks>.receiveTracks(
 class MediaStoreFetchDataSourceImpl @Inject constructor(
     @ApplicationContext context: Context,
     mediaStoreChangeNotifier: MediaStoreChangeNotifier,
-    private val musicDao: MusicDao,
-    private val playerEvents: com.gamapp.domain.player_interface.PlayerEvents,
-//    private val playerConnector: com.gamapp.domain.player_interface.PlayerConnector
+    private val musicDao: MusicDao
 ) : AbstractMediaStoreFetchDataSource(context = context) {
     private val tracksFlow = MutableStateFlow<List<TrackModel>>(emptyList())
     private val job = SupervisorJob()

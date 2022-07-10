@@ -116,7 +116,7 @@ fun SearchList(requestedTitle: MutableState<String>, nav: NavHostController) {
             },
             onItemClick = {
                 coroutineScope.launch {
-                    appViewModel.setAndPlay(tracks, currentTrack = it)
+                    appViewModel.playerInteracts.setPlayListAndPlay(playList = tracks, current = it)
                 }
             }
         )

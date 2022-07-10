@@ -2,6 +2,7 @@ package com.gamapp.dmplayer.presenter.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -26,12 +27,12 @@ import com.gamapp.dmplayer.presenter.ui.theme.PlayerTheme
 import com.gamapp.dmplayer.presenter.ui.theme.primary
 import com.gamapp.dmplayer.presenter.utils.isPermissionsGranted
 import com.gamapp.domain.player_interface.PlayerConnection
-import com.gamapp.domain.player_interface.setupPlayer
 import com.gamapp.graphics.R
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
+const val TAG = "LauncherActivityTAG"
 
 @AndroidEntryPoint
 class LauncherActivity : ComponentActivity() {
@@ -48,8 +49,13 @@ class LauncherActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        playerConnection.setup(this)
 
-        setupPlayer(playerConnection)
+        lifecycleScope.launch {
+            playerConnection.playerEvents.playbackState.collect {
+                Log.i(TAG, "onCreate: ${it.name}")
+            }
+        }
         startMusicService()
         setupWindowsInsets()
         registerProvider.setup(this)

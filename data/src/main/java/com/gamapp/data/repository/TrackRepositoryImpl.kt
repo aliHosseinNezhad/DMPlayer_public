@@ -8,6 +8,7 @@ import com.gamapp.data.data_source.media_store.MediaStoreUpdateTrackDataSource
 import com.gamapp.data.data_source.media_store.remove.MediaStoreRemoveTracksDataSource
 import com.gamapp.domain.models.AlbumModel
 import com.gamapp.domain.models.ArtistModel
+import com.gamapp.domain.models.BaseTrack
 import com.gamapp.domain.models.TrackModel
 import com.gamapp.domain.repository.FavoriteRepository
 import com.gamapp.domain.repository.QueueRepository
@@ -73,18 +74,18 @@ class TrackRepositoryImpl @Inject constructor(
 
 
     override suspend fun removeTrack(
-        track: TrackModel,
+        track: BaseTrack,
     ) {
         removeTracksDataSource.removeTrack(track)
     }
 
     override suspend fun removeTracks(
-        tracks: List<TrackModel>,
+        tracks: List<BaseTrack>,
     ) {
         removeTracksDataSource.removeTracks(tracks)
     }
 
-    override suspend fun updateTracks(tracks: List<TrackModel>, contentValues: ContentValues) {
+    override suspend fun updateTracks(tracks: List<BaseTrack>, contentValues: ContentValues) {
         updateTrackDataSource.update(tracks.map { it.id }, contentValues)
     }
 

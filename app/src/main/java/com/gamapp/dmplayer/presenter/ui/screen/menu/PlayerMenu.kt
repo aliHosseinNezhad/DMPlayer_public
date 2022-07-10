@@ -11,7 +11,9 @@ import com.gamapp.dmplayer.presenter.ui.screen.dialog.defaults.WarningDialogData
 import com.gamapp.dmplayer.presenter.ui.screen.dialog.defaults.WarningDialogTexts
 import com.gamapp.dmplayer.presenter.utils.shareMusic
 import com.gamapp.domain.model_usecase.remove
+import com.gamapp.domain.models.BaseTrack
 import com.gamapp.domain.models.TrackModel
+import com.gamapp.domain.usecase.data.tracks.GetTracksByIdUseCase
 import com.gamapp.domain.usecase.interacts.Interacts
 import com.gamapp.domain.usecase.interacts.TrackInteracts
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -22,9 +24,14 @@ typealias PlayerMenuTypeAlias = Pair<StringResource, () -> Unit>
 class PlayerMenu @Inject constructor(
     @ApplicationContext private val context: Context,
     private val trackInteracts: TrackInteracts,
-    private val act:Interacts
+    private val getTracksByIdUseCase: GetTracksByIdUseCase,
+    private val act: Interacts
 ) {
-    fun menu(track: State<TrackModel?>, dialogsState: DialogsState, nav:NavHostController): List<PlayerMenuTypeAlias> {
+    fun menu(
+        track: State<BaseTrack?>,
+        dialogsState: DialogsState,
+        nav: NavHostController
+    ): List<PlayerMenuTypeAlias> {
         return listOf(
             StringResource(R.string.share) to {
                 track.value?.let {
@@ -36,7 +43,10 @@ class PlayerMenu @Inject constructor(
                     dialogsState.show(WarningDialogData(
                         WarningDialogTexts.RemoveTrack,
                         onAccept = {
-                            track.value?.remove(act)
+                            track.value?.let {
+                                act.track.remove.invoke(it)
+
+                            }
                         }
                     ))
                 }

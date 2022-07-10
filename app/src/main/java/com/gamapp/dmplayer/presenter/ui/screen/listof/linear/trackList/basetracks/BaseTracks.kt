@@ -32,7 +32,7 @@ fun BaseTracks(
         popupList = popups,
         onItemClicked = { item ->
             scope.launch {
-                viewModel.setAndPlay(items, item)
+                viewModel.playerInteracts.setPlayListAndPlay(items, item)
                 onPlay(item)
             }
         },
