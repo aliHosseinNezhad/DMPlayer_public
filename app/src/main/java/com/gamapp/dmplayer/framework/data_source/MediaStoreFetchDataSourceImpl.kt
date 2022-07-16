@@ -63,70 +63,15 @@ suspend inline fun MutableStateFlow<LiveTracks>.receiveTracks(
 class MediaStoreFetchDataSourceImpl @Inject constructor(
     @ApplicationContext context: Context,
     mediaStoreChangeNotifier: MediaStoreChangeNotifier,
-    private val musicDao: MusicDao
 ) : AbstractMediaStoreFetchDataSource(context = context) {
-    private val tracksFlow = MutableStateFlow<List<TrackModel>>(emptyList())
-    private val job = SupervisorJob()
-    private val scope = CoroutineScope(Dispatchers.IO + job)
 
     override val liveTracks = MutableStateFlow<LiveTracks>(LiveTracks.Expired)
-
-    private var lastJob: Job? = null
-
     init {
-        start()
         mediaStoreChangeNotifier.register(object : MediaStoreChangeListener {
             override fun onMediaStoreChanged() {
                 liveTracks.tryEmit(LiveTracks.Expired)
-                start()
             }
         })
-    }
-
-    private fun start() {
-        scope.launch {
-            lastJob?.join()
-            lastJob = launch {
-                updateImpl()
-            }
-        }
-    }
-
-    private suspend fun updateImpl() {
-        val tracks = context.getTracks().sortedByDescending { it.dateAdded }
-        withContext(Dispatchers.IO) {
-            launch {
-                updatePlayer(tracks)
-            }
-            launch {
-                updateLocalStorage(tracks)
-            }
-            launch {
-                tracksFlow.emit(tracks)
-            }
-        }
-    }
-
-    private suspend fun updateLocalStorage(tracks: List<TrackModel>) {
-        val musics = musicDao.getAll()
-        val input = tracks.map { it.toTrackEntity() }.map { it to New }
-        val previous = musics.map { it to Current }
-        val sum = input + previous
-        val result = sum.groupBy {
-            it.first.fileId
-        }.mapNotNull {
-            if (it.value.size == 2) {
-                it.value.firstOrNull { it.second == New }!!.first to Update
-            } else {
-                val item = it.value.first()
-                if (item.second == Current) item.first to Remove
-                else null
-            }
-        }
-        val removes = result.mapNotNull { if (it.second == Remove) it.first else null }
-        val updates = result.mapNotNull { if (it.second == Update) it.first else null }
-        musicDao.delete(removes)
-        musicDao.update(updates)
     }
 
     private suspend fun updatePlayer(tracks: List<TrackModel>) {

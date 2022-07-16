@@ -1,5 +1,5 @@
 package com.gamapp.domain.mediaStore
 
-interface MediaStoreChangeHandler {
+interface MediaStoreChangeReceiver {
     fun notifyMediaStoreChanged()
 }

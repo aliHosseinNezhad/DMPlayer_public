@@ -1,14 +1,17 @@
 package com.gamapp.dmplayer.framework.service
 
 import android.content.ContentResolver
+import android.content.Context
 import android.database.ContentObserver
 import android.os.Handler
 import android.provider.MediaStore
-import com.gamapp.domain.ACTIONS
 
+interface MediaStoreChangeListener {
+    fun onMediaStoreChange()
+}
 
-class MediaCategoryObserver(
-    private val musicService: MusicService,
+class MediaStoreObserver(
+    private val listener: MediaStoreChangeListener,
     private val mHandler: Handler,
 ) : ContentObserver(mHandler), Runnable {
 
@@ -28,30 +31,34 @@ class MediaCategoryObserver(
     }
 
     override fun run() {
-
-        musicService.notifyChange(ACTIONS.MEDIA_STORE_CHANGED)
+        listener.onMediaStoreChange()
     }
 }
 
-fun registerCategoryObserver(
+fun registerMediaStoreObserver(
     contentResolver: ContentResolver,
-    mediaCategoryObserver: MediaCategoryObserver,
+    observer: MediaStoreObserver,
 ) {
     contentResolver
         .registerContentObserver(
-            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, mediaCategoryObserver
+            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, true, observer
         )
     contentResolver
         .registerContentObserver(
-            MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, true, mediaCategoryObserver
+            MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, true, observer
         )
     contentResolver
         .registerContentObserver(
-            MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI, true, mediaCategoryObserver
+            MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI, true, observer
         )
     contentResolver
         .registerContentObserver(
-            MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI, true, mediaCategoryObserver
+            MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI, true, observer
         )
 
+}
+
+fun Context.unregisterMediaStoreObserver(observer: MediaStoreObserver?){
+    if (observer!=null)
+    contentResolver.unregisterContentObserver(observer)
 }

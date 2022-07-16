@@ -14,14 +14,13 @@ import com.google.gson.reflect.TypeToken
 
 inline fun <reified T : Route> NavHostController.navigateTo(route: T) {
     val json = Gson().toJson(route)
-    this.navigate(route = "${route.getQualifiedName()}/$json")
+    this.navigate(route = "${route.getKey()}/$json")
 }
 
 inline fun <reified T : Route> NavGraphBuilder.composable(
-    key: String = "",
     noinline content: @Composable (T) -> Unit
 ) {
-    val routeId = getQualifiedName<T>(key)
+    val routeId = getKey<T>()
     composable("$routeId/{data}", arguments = listOf(
         navArgument("data") {
             type = NavType.StringType

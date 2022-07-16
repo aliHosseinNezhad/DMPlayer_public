@@ -47,6 +47,7 @@ fun SkipToBackButton(
         LaunchedEffect(Unit) {
             snapshotFlow { pressed.value }.collectLatest {
                 var skip = 500L
+                if (it) delay(800)
                 while (it) {
                     rewindUseCase(skip)
                     delay(100)

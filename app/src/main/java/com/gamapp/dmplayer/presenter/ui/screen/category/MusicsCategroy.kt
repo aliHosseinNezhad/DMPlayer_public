@@ -1,6 +1,5 @@
 package com.gamapp.dmplayer.presenter.ui.screen.category
 
-import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
@@ -20,7 +19,7 @@ import com.gamapp.dmplayer.presenter.ui.screen.topbar.TitleBar
 import com.gamapp.dmplayer.presenter.ui.screen.ext.surfaceTheme
 import com.gamapp.dmplayer.presenter.ui.screen.listof.grid.AlbumsGridList
 import com.gamapp.dmplayer.presenter.ui.screen.listof.grid.ArtistsGridList
-import com.gamapp.dmplayer.presenter.ui.screen.listof.linear.trackList.AllTracksVerticalList
+import com.gamapp.dmplayer.presenter.ui.screen.listof.linear.trackList.AllTracks
 import com.gamapp.dmplayer.presenter.ui.screen.listof.linear.QueueLists
 import com.gamapp.dmplayer.presenter.utils.navigationBarHeight
 import com.gamapp.dmplayer.presenter.utils.statusBarHeight
@@ -29,17 +28,8 @@ import com.gamapp.dmplayer.presenter.viewmodel.CategoryViewModel
 import com.gamapp.dmplayer.presenter.viewmodel.QueueViewModel
 import com.gamapp.dmplayer.presenter.viewmodel.TracksViewModel
 import com.gamapp.layout.categorypager.*
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import java.util.concurrent.TimeUnit
-import javax.inject.Singleton
-
 
 
 @Composable
@@ -210,7 +200,7 @@ fun Category(
                 categoryViewModel = categoryViewModel,
             )
             QueueLists(nav = nav, viewModel = queueViewModel)
-            AllTracksVerticalList(viewModel = trackViewModel, nav = nav)
+            AllTracks(viewModel = trackViewModel, nav = nav)
         }
     }
 }

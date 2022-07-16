@@ -8,7 +8,7 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import com.gamapp.dmplayer.framework.service.MusicService
+import com.gamapp.dmplayer.framework.service.MediaPlayerService
 import com.gamapp.dmplayer.framework.service.MusicSource
 import com.gamapp.domain.player_interface.PlayerConnection
 import com.gamapp.domain.usecase.data.tracks.GetTracksByIdUseCase
@@ -17,15 +17,42 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import java.lang.IllegalStateException
 import javax.inject.Inject
-import javax.inject.Singleton
 
+fun MediaBrowserCompat?.tryConnect(){
+    this?.let {
+        try {
+            if (!it.isConnected){
+                this.connect()
+            }
+        } catch (e:IllegalStateException){
+            e.printStackTrace()
+        }
+    }
+
+}
+fun MediaBrowserCompat?.tryDisconnect(){
+    this?.let {
+        try {
+            if (this.isConnected){
+                this.disconnect()
+            }
+        } catch (e:IllegalStateException){
+            e.printStackTrace()
+        }
+    }
+}
 
 class PlayerConnectionImpl @Inject constructor(
     @ApplicationContext val context: Context,
     private val musicSource: MusicSource,
     private val getTracksByIdUseCase: GetTracksByIdUseCase,
 ) : PlayerConnection {
+    companion object {
+        const val TAG = "PlayerConnectionTAG"
+    }
+
     private var mediaBrowser: MediaBrowserCompat? = null
     private var currentActivity: Activity? = null
     private val mediaController: MediaControllerCompat?
@@ -65,11 +92,11 @@ class PlayerConnectionImpl @Inject constructor(
         }
 
         override fun onConnectionSuspended() {
-
+            Log.i("MusicServiceTAG", "inside connection callback  onConnectionSuspended")
         }
 
         override fun onConnectionFailed() {
-
+            Log.i("MusicServiceTAG", "inside connection callback  onConnectionFailed")
         }
     }
 
@@ -94,35 +121,30 @@ class PlayerConnectionImpl @Inject constructor(
         }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-        when (event.targetState) {
-            Lifecycle.State.CREATED -> {
+        when (event) {
+            Lifecycle.Event.ON_CREATE -> {
+                Log.i(TAG, "onStateChanged: OnCreate")
                 val job = SupervisorJob()
                 scope = CoroutineScope(Dispatchers.Main + job)
                 mediaBrowser = MediaBrowserCompat(
                     context,
                     ComponentName(
                         context,
-                        MusicService::class.java
+                        MediaPlayerService::class.java
                     ),
                     mediaBrowserConnectionCallback,
                     null
                 )
             }
-            Lifecycle.State.STARTED -> {
-                mediaBrowser?.let {
-                    if (!it.isConnected)
-                        it.connect()
-                }
+            Lifecycle.Event.ON_START -> {
+                mediaBrowser.tryConnect()
             }
-            Lifecycle.State.DESTROYED -> {
+            Lifecycle.Event.ON_STOP -> {
                 mediaController?.let {
                     it.unregisterCallback(mediaControllerCallback)
                     playerEvents.unregister(it)
                 }
-                mediaBrowser?.let {
-                    if (it.isConnected)
-                        it.disconnect()
-                }
+                mediaBrowser.tryDisconnect()
                 currentActivity = null
                 scope?.cancel()
                 scope = null

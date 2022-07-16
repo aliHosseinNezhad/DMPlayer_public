@@ -1,9 +1,9 @@
 package com.gamapp.dmplayer.framework.di
 
 import android.content.Context
-import com.gamapp.dmplayer.framework.MediaStoreChangeHandlerImpl
+import com.gamapp.dmplayer.framework.MediaStoreChangeReceiverImpl
 import com.gamapp.dmplayer.framework.player.*
-import com.gamapp.domain.mediaStore.MediaStoreChangeHandler
+import com.gamapp.domain.mediaStore.MediaStoreChangeReceiver
 import com.gamapp.domain.mediaStore.MediaStoreChangeNotifier
 import com.gamapp.domain.player_interface.PlayerConnection
 import com.gamapp.domain.player_interface.PlayerController
@@ -51,13 +51,13 @@ object PlayerModule {
 
     @Singleton
     @Provides
-    fun provideMediaStoreChangeHandler(mediaStoreChangeHandler: MediaStoreChangeHandlerImpl): MediaStoreChangeHandler {
+    fun provideMediaStoreChangeHandler(mediaStoreChangeHandler: MediaStoreChangeReceiverImpl): MediaStoreChangeReceiver {
         return mediaStoreChangeHandler
     }
 
     @Singleton
     @Provides
-    fun provideMediaStoreChangeNotifier(notifier: MediaStoreChangeHandlerImpl): MediaStoreChangeNotifier {
+    fun provideMediaStoreChangeNotifier(notifier: MediaStoreChangeReceiverImpl): MediaStoreChangeNotifier {
         return notifier
     }
 }

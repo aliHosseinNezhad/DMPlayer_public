@@ -27,65 +27,82 @@ val projection = arrayOf(
 )
 
 suspend fun Cursor?.captureTracks(): List<TrackModel> {
-    this?.use { cursor ->
-        val tracks = mutableListOf<TrackModel>()
-        cursor.use {
-            withContext(Dispatchers.IO) {
-                try {
-                    val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns._ID)
-                    val fileNameColumn =
-                        cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DISPLAY_NAME)
-                    val durationColumn =
-                        cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DURATION)
-                    val sizeColumn =
-                        cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.SIZE)
-                    val titleColumn =
-                        cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.TITLE)
-                    val artistColumn =
-                        cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.ARTIST)
-                    val albumColumn =
-                        cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.ALBUM)
-                    val artistIdColumn =
-                        cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.ARTIST_ID)
-                    val albumIdColumn =
-                        cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.ALBUM_ID)
-                    val dataAddedColumn =
-                        cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DATE_ADDED)
-                    val isMusicColumn =
-                        cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.IS_MUSIC)
-                    while (moveToNext()) {
-                        val id = cursor.getLongOrNull(idColumn) ?: continue
-                        val fileName = cursor.getStringOrNull(fileNameColumn) ?: ""
-                        val duration = cursor.getIntOrNull(durationColumn) ?: 0
-                        val size = cursor.getIntOrNull(sizeColumn) ?: 0
-                        val title = cursor.getStringOrNull(titleColumn) ?: ""
-                        val artist = cursor.getStringOrNull(artistColumn) ?: ""
-                        val album = cursor.getStringOrNull(albumColumn) ?: ""
-                        val artistId = cursor.getLongOrNull(artistIdColumn) ?: -1
-                        val albumId = cursor.getLongOrNull(albumIdColumn) ?: -1
-                        val dateAdded = cursor.getLongOrNull(dataAddedColumn) ?: 0
-                        val isMusic = cursor.getIntOrNull(isMusicColumn)?.let {
-                            it == 1
-                        } ?: true
-                        if (!isMusic)
-                            continue
-                        tracks += TrackModel(
-                            fileName = fileName,
-                            id = id,
-                            title = title,
-                            artist = artist,
-                            album = album,
-                            duration = duration,
-                            size = size,
-                            albumId = albumId,
-                            artistId = artistId,
-                            dateAdded = dateAdded
-                        )
-                    }
-                } catch (e: Exception) {
-                }
-            }
-            return tracks
+    val tracks = mutableListOf<TrackModel>()
+    withContext(Dispatchers.IO) {
+        captureTracks {
+            tracks += it
         }
-    } ?: return emptyList()
+    }
+    return tracks
+}
+
+interface CaptureScope {
+    fun finishLoop()
+}
+
+inline fun Cursor?.captureTracks(onTrack: CaptureScope.(TrackModel) -> Unit) {
+    val captureScope = object : CaptureScope {
+        var finish: Boolean = false
+        override fun finishLoop() {
+            finish = true
+        }
+    }
+    this?.use { cursor ->
+        try {
+            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns._ID)
+            val fileNameColumn =
+                cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DISPLAY_NAME)
+            val durationColumn =
+                cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DURATION)
+            val sizeColumn =
+                cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.SIZE)
+            val titleColumn =
+                cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.TITLE)
+            val artistColumn =
+                cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.ARTIST)
+            val albumColumn =
+                cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.ALBUM)
+            val artistIdColumn =
+                cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.ARTIST_ID)
+            val albumIdColumn =
+                cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.ALBUM_ID)
+            val dataAddedColumn =
+                cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DATE_ADDED)
+            val isMusicColumn =
+                cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.IS_MUSIC)
+            while (moveToNext()) {
+                val id = cursor.getLongOrNull(idColumn) ?: continue
+                val fileName = cursor.getStringOrNull(fileNameColumn) ?: ""
+                val duration = cursor.getIntOrNull(durationColumn) ?: 0
+                val size = cursor.getIntOrNull(sizeColumn) ?: 0
+                val title = cursor.getStringOrNull(titleColumn) ?: ""
+                val artist = cursor.getStringOrNull(artistColumn) ?: ""
+                val album = cursor.getStringOrNull(albumColumn) ?: ""
+                val artistId = cursor.getLongOrNull(artistIdColumn) ?: -1
+                val albumId = cursor.getLongOrNull(albumIdColumn) ?: -1
+                val dateAdded = cursor.getLongOrNull(dataAddedColumn) ?: 0
+                val isMusic = cursor.getIntOrNull(isMusicColumn)?.let {
+                    it == 1
+                } ?: true
+                if (!isMusic)
+                    continue
+                captureScope.onTrack(
+                    TrackModel(
+                        fileName = fileName,
+                        id = id,
+                        title = title,
+                        artist = artist,
+                        album = album,
+                        duration = duration,
+                        size = size,
+                        albumId = albumId,
+                        artistId = artistId,
+                        dateAdded = dateAdded
+                    )
+                )
+                if (captureScope.finish) break
+            }
+        } catch (e: Exception) {
+        }
+    }
 }

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_app_not_able_to_play">DMPlayer Wasn\'t able to play this file!</string>
+</resources>

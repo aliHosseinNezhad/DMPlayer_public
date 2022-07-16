@@ -32,4 +32,11 @@ interface QueueRepository {
     suspend fun getAllQueuesViaLiveData(): LiveData<List<QueueModel>>
     suspend fun getAllQueues(): List<QueueModel>
     suspend fun getQueue(id: String): QueueModel
+
+
+
+    /**
+     * update by media store change
+     * */
+    suspend fun updateTracksByMediaStoreChange(newTracks:List<TrackModel>)
 }

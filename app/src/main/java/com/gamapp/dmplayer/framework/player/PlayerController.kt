@@ -80,10 +80,18 @@ class PlayerControllerImpl(
         playList: List<TrackModel>,
         playWhenReady: Boolean
     ) {
-        musicSource.setPlayList(playList)
+        val equalPlayList = playList == playerEvents.playList.value
+        if (!equalPlayList){
+            musicSource.setPlayList(playList)
+        }
         controller?.prepareFromMediaId(current.id.toString(), Bundle().apply {
             putBoolean(MusicPlaybackPreparer.PlayWhenReady, playWhenReady)
             current.bundle(this)
         })
     }
+
+
+
 }
+
+

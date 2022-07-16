@@ -79,7 +79,7 @@ class MusicServiceConnection @Inject constructor(
                     context,
                     ComponentName(
                         context,
-                        MusicService::class.java
+                        MediaPlayerService::class.java
                     ),
                     mediaBrowserConnectionCallback,
                     null

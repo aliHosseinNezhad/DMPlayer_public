@@ -15,7 +15,7 @@ import com.gamapp.dmplayer.presenter.viewmodel.AppViewModel
 import com.gamapp.dmplayer.presenter.viewmodel.TracksViewModel
 
 @Composable
-fun AllTracksVerticalList(viewModel: TracksViewModel = viewModel(), nav: NavHostController) {
+fun AllTracks(viewModel: TracksViewModel = viewModel(), nav: NavHostController) {
     val appViewModel = viewModel<AppViewModel>()
     val tracks by remember(viewModel) {
         viewModel.trackInteracts.get.invoke()

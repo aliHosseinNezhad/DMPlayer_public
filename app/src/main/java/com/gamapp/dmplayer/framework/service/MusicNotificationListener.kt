@@ -7,14 +7,15 @@ import com.gamapp.domain.Constant.NOTIFICATION_ID
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 
 class MusicPlayerNotificationListener constructor(
-    private val musicService: MusicService
+    private val mediaPlayerService: MediaPlayerService
 ) : PlayerNotificationManager.NotificationListener {
     override fun onNotificationCancelled(notificationId: Int, dismissedByUser: Boolean) {
         super.onNotificationCancelled(notificationId, dismissedByUser)
-        musicService.apply {
+        mediaPlayerService.apply {
             stopForeground(true)
             isForegroundService = false
             player.stop()
+            stopSelf()
         }
     }
 
@@ -24,7 +25,7 @@ class MusicPlayerNotificationListener constructor(
         ongoing: Boolean
     ) {
         super.onNotificationPosted(notificationId, notification, ongoing)
-        musicService.apply {
+        mediaPlayerService.apply {
             if (ongoing && !isForegroundService) {
                 ContextCompat.startForegroundService(
                     this,

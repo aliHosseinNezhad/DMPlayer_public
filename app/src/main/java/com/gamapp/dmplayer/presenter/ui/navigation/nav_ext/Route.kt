@@ -3,19 +3,14 @@ package com.gamapp.dmplayer.presenter.ui.navigation.nav_ext
 import android.os.Parcelable
 
 
-abstract class Route(open val key: String = "") : Parcelable
+abstract class Route() : Parcelable
 
-inline fun <reified T : Route> T.getQualifiedName(): String {
+inline fun <reified T : Route> T.getKey(): String {
     val kClazz = T::class
-    return ((kClazz.qualifiedName ?: "") + key)
+    return (kClazz.qualifiedName ?: "")
 }
 
-//inline fun <reified T : Route> T.getKey(): Pair<String, Route> {
-//    val key = getQualifiedName()
-//    return key to this
-//}
-
-inline fun <reified T : Route> getQualifiedName(key: String): String {
+inline fun <reified T : Route> getKey(): String {
     val kClazz = T::class
-    return (kClazz.qualifiedName ?: "") + key
+    return (kClazz.qualifiedName ?: "")
 }

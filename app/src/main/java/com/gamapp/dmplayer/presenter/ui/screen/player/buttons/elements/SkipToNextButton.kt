@@ -47,6 +47,7 @@ fun SkipToNextButton(
         val pressed = forwardButtonInteractionSource.collectIsPressedAsState()
         LaunchedEffect(Unit) {
             snapshotFlow { pressed.value }.collectLatest {
+                if (it) delay(800)
                 var skip = 500L
                 while (it) {
                     forwardUseCase(skip)

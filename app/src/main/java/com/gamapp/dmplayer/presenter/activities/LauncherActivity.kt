@@ -1,7 +1,11 @@
 package com.gamapp.dmplayer.presenter.activities
 
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -18,7 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.gamapp.data.db.ApplicationDatastore
 import com.gamapp.data.db.PlayerDatastore
 import com.gamapp.dmplayer.framework.ActivityResultRegisterProvider
-import com.gamapp.dmplayer.framework.service.MusicService
+import com.gamapp.dmplayer.framework.service.*
 import com.gamapp.dmplayer.presenter.ui.navigation.SetUpNavigation
 import com.gamapp.dmplayer.presenter.ui.screen.PermissionScreen
 import com.gamapp.dmplayer.presenter.ui.screen.PermissionScreenCallback
@@ -29,7 +33,6 @@ import com.gamapp.dmplayer.presenter.utils.isPermissionsGranted
 import com.gamapp.domain.player_interface.PlayerConnection
 import com.gamapp.graphics.R
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 const val TAG = "LauncherActivityTAG"
@@ -47,19 +50,19 @@ class LauncherActivity : ComponentActivity() {
     @Inject
     lateinit var registerProvider: ActivityResultRegisterProvider
 
+
+    private val connection = object:ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {}
+        override fun onServiceDisconnected(name: ComponentName?) {}
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        playerConnection.setup(this)
-
-        lifecycleScope.launch {
-            playerConnection.playerEvents.playbackState.collect {
-                Log.i(TAG, "onCreate: ${it.name}")
-            }
-        }
-        startMusicService()
         setupWindowsInsets()
+        playerConnection.setup(this)
         registerProvider.setup(this)
-
+        val intent = Intent(this,MediaStoreChangeListenerService::class.java)
+        bindService(intent,connection, Context.BIND_AUTO_CREATE)
         setContent {
             PlayerTheme {
                 PermissionScreen {
@@ -82,41 +85,10 @@ class LauncherActivity : ComponentActivity() {
         }
     }
 
-    private fun startMusicService() {
-        val intent = Intent(this, MusicService::class.java)
-        startService(intent)
-        setupWindowsInsets()
-    }
-
-    private fun setContent() {
-        if (isPermissionsGranted()) {
-            setContentView(FrameLayout(this).apply {
-                layoutParams = ViewGroup.LayoutParams(-1, -1)
-                this += ImageView(context).apply {
-                    layoutParams = FrameLayout.LayoutParams(300, 300).apply {
-                        gravity = Gravity.CENTER
-                    }
-                    setImageResource(R.drawable.ic_track)
-                    setColorFilter(primary.toArgb())
-                }
-            })
-            startMainActivity()
-        } else
-            setContent {
-                PlayerTheme {
-                    PermissionScreenCallback {
-                        startMainActivity()
-                    }
-                }
-            }
-    }
-
-    private fun startMainActivity() {
-        lifecycleScope.launchWhenResumed {
-            PlayerDatastore.setData(applicationDatastore = io)
-            val intent = Intent(this@LauncherActivity, MainActivity::class.java)
-            startActivity(intent)
-        }
+    override fun onDestroy() {
+        super.onDestroy()
+        unbindService(connection)
+        Log.i("MusicServiceTAG", "Activity onDestroy: ")
     }
 }
 

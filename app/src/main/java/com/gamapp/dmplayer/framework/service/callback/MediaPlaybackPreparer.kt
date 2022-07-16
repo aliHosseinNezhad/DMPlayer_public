@@ -14,6 +14,7 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 
 class MusicPlaybackPreparer(
+    private val player:Player,
     private val playerPrepared: (playWhenReady: Boolean, currentMediaItem: MediaDescriptionCompat?) -> Unit
 ) : MediaSessionConnector.PlaybackPreparer {
 
@@ -33,7 +34,9 @@ class MusicPlaybackPreparer(
                 PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID
     }
 
-    override fun onPrepare(playWhenReady: Boolean) = Unit
+    override fun onPrepare(playWhenReady: Boolean) {
+        player.playWhenReady = playWhenReady
+    }
 
     override fun onPrepareFromMediaId(mediaId: String, playWhenReady: Boolean, extras: Bundle?) {
         val media = extras.getTrackModel()?.toMediaDescription()

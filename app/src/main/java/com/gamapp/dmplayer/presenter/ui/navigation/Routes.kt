@@ -8,10 +8,6 @@ import kotlinx.parcelize.Parcelize
 
 
 @Parcelize
-class MainRoute(val title: String = "Category") : Route()
-
-
-@Parcelize
 data class TrackByAlbumRoute(
     val album: Long
 ) : Route()

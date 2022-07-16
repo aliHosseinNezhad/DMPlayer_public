@@ -27,7 +27,11 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
+const val Insert = "insert"
+const val Remove = "remove"
+const val Update = "update"
+const val Current = "current"
+const val New = "new"
 class QueueRepositoryImp @Inject constructor(
     private val queueDao: QueueDao,
     private val musicDao: MusicDao,
@@ -195,5 +199,27 @@ class QueueRepositoryImp @Inject constructor(
             count = queueDao.getQueueTracksCountWithLiveData(queue.id),
             imageId = queueDao.getQueueCoverImageIdWithLiveData(queue.id)
         )
+    }
+
+    override suspend fun updateTracksByMediaStoreChange(newTracks: List<TrackModel>) {
+        val musics = musicDao.getAll()
+        val input = newTracks.map { it.toTrackEntity() }.map { it to New }
+        val previous = musics.map { it to Current }
+        val sum = input + previous
+        val result = sum.groupBy {
+            it.first.fileId
+        }.mapNotNull {
+            if (it.value.size == 2) {
+                it.value.firstOrNull { it.second == New }!!.first to Update
+            } else {
+                val item = it.value.first()
+                if (item.second == Current) item.first to Remove
+                else null
+            }
+        }
+        val removes = result.mapNotNull { if (it.second == Remove) it.first else null }
+        val updates = result.mapNotNull { if (it.second == Update) it.first else null }
+        musicDao.delete(removes)
+        musicDao.update(updates)
     }
 }

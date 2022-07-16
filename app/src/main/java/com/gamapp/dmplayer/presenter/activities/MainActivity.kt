@@ -8,11 +8,14 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.ViewCompat
 import com.gamapp.dmplayer.R
-import com.gamapp.dmplayer.framework.service.MusicService
+import com.gamapp.dmplayer.framework.service.MediaPlayerService
 import com.gamapp.dmplayer.presenter.ui.theme.PlayerTheme
 import com.gamapp.dmplayer.presenter.ui.theme.dark
 import com.gamapp.dmplayer.presenter.ui.theme.primary
@@ -28,10 +31,13 @@ fun Insets.string(): String {
 class MainActivity : AppCompatActivity() {
     val appViewModel: AppViewModel by viewModels()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val intent = Intent(this, MusicService::class.java)
+
+        val intent = Intent(this, MediaPlayerService::class.java)
         startService(intent)
+
         window.setFlags(
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE,
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
