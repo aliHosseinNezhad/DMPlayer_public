@@ -17,9 +17,7 @@ import com.gamapp.domain.sealedclasses.Order
 import com.gamapp.domain.sealedclasses.Sort
 import com.gamapp.domain.sealedclasses.TrackSort
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 class TrackRepositoryImpl @Inject constructor(
@@ -35,6 +33,7 @@ class TrackRepositoryImpl @Inject constructor(
             Order.ETS
         )
     )
+
     override fun artist(id: Long): LiveData<ArtistModel> {
         return mediaStoreFetchDataSource.getArtistById(id)
             .combine(trackSortOrder, transform = { a, b ->
@@ -93,4 +92,8 @@ class TrackRepositoryImpl @Inject constructor(
         return mediaStoreFetchDataSource.getTracksByIds(ids)
     }
 
+    override fun getTrackById(id: Long): Flow<TrackModel?> {
+        return mediaStoreFetchDataSource.getTrackById(id)
+
+    }
 }

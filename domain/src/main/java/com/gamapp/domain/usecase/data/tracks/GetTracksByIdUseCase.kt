@@ -10,9 +10,14 @@ import javax.inject.Inject
 class GetTracksByIdUseCase @Inject constructor(
     private val repository: TrackRepository
 ) {
-    suspend operator fun invoke(id:Long) :TrackModel? {
-        return invoke(listOf(id)).getOrNull(0)
+    suspend operator fun invoke(id: Long): TrackModel? {
+        var track: TrackModel? = null
+        repository.getTrackById(id).take(1).collect {
+            track = it
+        }
+        return track
     }
+
     suspend operator fun invoke(ids: List<Long>): List<TrackModel> {
         val tracks: List<TrackModel>
         coroutineScope {

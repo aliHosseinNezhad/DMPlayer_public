@@ -6,15 +6,14 @@ import android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_ALL
 import android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_NONE
 import android.util.Log
 import com.gamapp.dmplayer.framework.service.MusicSource
-import com.gamapp.dmplayer.framework.service.callback.MusicPlaybackPreparer
-import com.gamapp.domain.mapper.bundle
+import com.gamapp.domain.Constant
+import com.gamapp.domain.mapper.toJson
 import com.gamapp.domain.models.BaseTrack
 import com.gamapp.domain.models.TrackModel
 import com.gamapp.domain.player_interface.PlayerController
 import com.gamapp.domain.player_interface.RepeatMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 const val TAG = "PlayerControllerTAG"
@@ -80,16 +79,16 @@ class PlayerControllerImpl(
         playList: List<TrackModel>,
         playWhenReady: Boolean
     ) {
-        val equalPlayList = playList == playerEvents.playList.value
-        if (!equalPlayList){
+        Log.i("MusicServiceTAG","try to setPlayList")
+        try {
             musicSource.setPlayList(playList)
+            controller?.prepareFromMediaId(current.id.toString(), Bundle().apply {
+                putBoolean(Constant.PLAY_WHEN_READY, playWhenReady)
+            })
+        } catch (e:Exception){
+            Log.i(TAG, e.message.toString())
         }
-        controller?.prepareFromMediaId(current.id.toString(), Bundle().apply {
-            putBoolean(MusicPlaybackPreparer.PlayWhenReady, playWhenReady)
-            current.bundle(this)
-        })
     }
-
 
 
 }

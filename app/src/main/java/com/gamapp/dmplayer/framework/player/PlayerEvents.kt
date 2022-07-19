@@ -1,14 +1,17 @@
 package com.gamapp.dmplayer.framework.player
 
+import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import com.gamapp.domain.models.ArtistModel.Companion.empty
+import com.gamapp.domain.Constant
 import com.gamapp.domain.models.BaseTrack
-import com.gamapp.domain.models.BaseTrackModel
 import com.gamapp.domain.models.TrackModel
-import com.gamapp.domain.player_interface.*
+import com.gamapp.domain.player_interface.PlaybackState
+import com.gamapp.domain.player_interface.PlayerEvents
+import com.gamapp.domain.player_interface.RepeatMode
+import com.gamapp.domain.player_interface.tryEmit
 import com.gamapp.domain.usecase.data.tracks.GetTracksByIdUseCase
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -61,8 +64,13 @@ class PlayerEventImpl(
     private val callback = object : MediaControllerCompat.Callback() {
         val data = this@PlayerEventImpl
         var isPlaying = false
+
+
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
             super.onPlaybackStateChanged(state)
+
+
+
             val playbackState = PlaybackState.create(state?.state)
             data.playbackState tryEmit playbackState
 
@@ -86,7 +94,6 @@ class PlayerEventImpl(
             super.onRepeatModeChanged(repeatMode)
             data.repeatMode.tryEmit(RepeatMode.toRepeatMode(repeatMode))
         }
-
         override fun onShuffleModeChanged(shuffleMode: Int) {
             super.onShuffleModeChanged(shuffleMode)
             data.shuffle.tryEmit(shuffleMode != PlaybackStateCompat.SHUFFLE_MODE_NONE)
@@ -95,7 +102,7 @@ class PlayerEventImpl(
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
             super.onMetadataChanged(metadata)
             metadata ?: return
-            val duration = metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION) ?: 0L
+            val duration = metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION)
             data.duration tryEmit duration
             val id = try {
                 metadata.description?.mediaId?.toLong()
@@ -114,16 +121,42 @@ class PlayerEventImpl(
 
         override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>?) {
             super.onQueueChanged(queue)
-            val tracks = queue?.mapNotNull {
-                it.description.toTrackModel()
-            } ?: emptyList()
-            playList tryEmit tracks
+            scope?.launch {
+                val tracks = queue?.mapNotNull {
+                    it.description.mediaId?.toLongOrNull()
+
+                }?.mapNotNull {
+                    getTracksByIdUseCase(it)
+                }?: emptyList()
+                playList tryEmit tracks
+            }
+        }
+    }
+    private val subscriptionCallback = object : MediaBrowserCompat.SubscriptionCallback() {
+        override fun onChildrenLoaded(
+            parentId: String,
+            children: MutableList<MediaBrowserCompat.MediaItem>
+        ) {
+
+        }
+
+        override fun onError(parentId: String) {
+            playList tryEmit emptyList()
         }
     }
 
 
     fun register(controller: MediaControllerCompat) {
         controller.registerCallback(callback)
+
+    }
+
+    fun subscribe(mediaBrowser: MediaBrowserCompat?) {
+        mediaBrowser?.subscribe(Constant.MUSIC_SERVICE_ROOT_ID, subscriptionCallback)
+    }
+
+    fun unsubscribe(mediaBrowser: MediaBrowserCompat?) {
+        mediaBrowser?.unsubscribe(Constant.MUSIC_SERVICE_ROOT_ID, subscriptionCallback)
     }
 
     fun unregister(controller: MediaControllerCompat) {

@@ -22,4 +22,6 @@ interface MediaStoreFetchDataSource {
      * @param ids list of tracks ids
      * */
     fun getTracksByIds(ids: List<Long>): Flow<List<TrackModel>>
+
+    fun getTrackById(id:Long):Flow<TrackModel?>
 }

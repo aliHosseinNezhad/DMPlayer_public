@@ -21,5 +21,6 @@ interface TrackRepository {
     suspend fun removeTracks(tracks: List<BaseTrack>)
     suspend fun updateTracks(tracks: List<BaseTrack>, contentValues: ContentValues)
     fun getTracksById(ids: List<Long>): Flow<List<TrackModel>>
+    fun getTrackById(id: Long): Flow<TrackModel?>
     val trackSortOrder: MutableStateFlow<Sort<TrackModel>>
 }

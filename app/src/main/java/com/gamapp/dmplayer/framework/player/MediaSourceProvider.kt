@@ -34,7 +34,7 @@ fun TrackModel.toMediaMetaData(): MediaMetadataCompat {
         .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, subtitle)
         .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI,id.toMusicUri().toString())
         .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, subtitle)
-        .putString(MediaMetadataCompat.METADATA_KEY_DURATION, duration.toString())
+        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration.toLong())
         .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
         .putString(MediaMetadataCompat.METADATA_KEY_TITLE, artist)
         .build()

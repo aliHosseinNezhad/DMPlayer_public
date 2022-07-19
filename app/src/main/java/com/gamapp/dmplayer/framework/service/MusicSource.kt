@@ -1,75 +1,47 @@
 package com.gamapp.dmplayer.framework.service
 
-import android.support.v4.media.MediaBrowserCompat
-import android.support.v4.media.MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
-import android.support.v4.media.MediaDescriptionCompat
-import com.gamapp.dmplayer.framework.player.toMediaDescription
-import com.gamapp.dmplayer.framework.service.State.*
+import android.support.v4.media.MediaMetadataCompat
+import android.util.Log
+import com.gamapp.dmplayer.framework.player.toMediaMetaData
 import com.gamapp.domain.models.TrackModel
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.upstream.DefaultDataSource
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
+fun List<TrackModel>?.isEqual(other: List<TrackModel>?): Boolean {
+    if (this == null && other == null) return true
+    if (this == null || other == null) return false
+    if (this.isEmpty() && other.isEmpty()) return false
+    if (this.size != other.size) return false
+    for (i in indices) {
+        if (this[i] != other[i]) return false
+    }
+    return true
+}
+
 @Singleton
 class MusicSource @Inject constructor() {
+    var songs: List<MediaMetadataCompat> = emptyList()
+        private set
 
-    var songs = emptyList<MediaDescriptionCompat>()
+    private var listener: (() -> Unit)? = null
 
-    fun setPlayList(allSongs: List<TrackModel>) {
-        state = STATE_INITIALIZING
-        songs = allSongs.mapNotNull { song ->
-            song.toMediaDescription()
-        }
-        state = STATE_INITIALIZED
+    fun setPlayListChangeListener(scope: () -> Unit) {
+        listener = scope
     }
 
-    fun asMediaSource(dataSourceFactory: DefaultDataSource.Factory): ConcatenatingMediaSource {
-        val concatenatingMediaSource = ConcatenatingMediaSource()
-        songs.forEach { song ->
-            val uri = song.mediaUri
-            if (uri != null) {
-                val mediaSource =
-                    ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
-                        MediaItem.fromUri(uri)
-                    )
-                concatenatingMediaSource.addMediaSource(mediaSource)
-            }
-        }
-        return concatenatingMediaSource
+
+    private fun setPlayList(list: List<MediaMetadataCompat>) {
+        songs = list
+        Log.i(TAG, "setPlayList: set")
+        listener?.invoke()
     }
 
-    fun asMediaItems() = songs.map { song ->
-        MediaBrowserCompat.MediaItem(song, FLAG_PLAYABLE)
-    }.toMutableList()
-
-    private val onReadyListeners = mutableListOf<(Boolean) -> Unit>()
-
-    private var state: State = STATE_CREATED
-        set(value) {
-            if (value == STATE_INITIALIZED || value == STATE_ERROR) {
-                synchronized(onReadyListeners) {
-                    field = value
-                    onReadyListeners.forEach { listener ->
-                        listener(state == STATE_INITIALIZED)
-                    }
-                }
-            } else {
-                field = value
-            }
-        }
-
-    fun whenReady(action: (Boolean) -> Unit): Boolean {
-        if (state == STATE_CREATED || state == STATE_INITIALIZING) {
-            onReadyListeners += action
-            return false
-        } else {
-            action(state == STATE_INITIALIZED)
-            return true
-        }
+    @JvmName("setPlayList_TrackModel")
+    fun setPlayList(list: List<TrackModel>) {
+        setPlayList(list.map { it.toMediaMetaData() })
     }
+
 }
 
 enum class State {

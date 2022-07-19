@@ -138,12 +138,14 @@ class PlayerConnectionImpl @Inject constructor(
             }
             Lifecycle.Event.ON_START -> {
                 mediaBrowser.tryConnect()
+                playerEvents.subscribe(mediaBrowser)
             }
-            Lifecycle.Event.ON_STOP -> {
+            Lifecycle.Event.ON_DESTROY -> {
                 mediaController?.let {
                     it.unregisterCallback(mediaControllerCallback)
                     playerEvents.unregister(it)
                 }
+                playerEvents.unsubscribe(mediaBrowser)
                 mediaBrowser.tryDisconnect()
                 currentActivity = null
                 scope?.cancel()

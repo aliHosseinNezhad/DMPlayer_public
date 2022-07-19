@@ -66,6 +66,7 @@ class MediaStoreFetchDataSourceImpl @Inject constructor(
 ) : AbstractMediaStoreFetchDataSource(context = context) {
 
     override val liveTracks = MutableStateFlow<LiveTracks>(LiveTracks.Expired)
+
     init {
         mediaStoreChangeNotifier.register(object : MediaStoreChangeListener {
             override fun onMediaStoreChanged() {
@@ -169,6 +170,16 @@ abstract class AbstractMediaStoreFetchDataSource constructor(protected val conte
         }
     }
 
+    override fun getTrackById(id: Long): Flow<TrackModel?> {
+        return channelFlow {
+            liveTracks.receiveTracks(context) { allTracks ->
+                val index = allTracks.binarySearch {
+                    it.id.compareTo(id)
+                }
+                send(allTracks.getOrNull(index))
+            }
+        }
+    }
 }
 
 

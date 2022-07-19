@@ -69,15 +69,14 @@ fun TrackPlayerScope.TracksImagePager(
             val recyclerState = rememberRecyclerPagerState(initItem = currentTrack!!, data = tracks)
             LaunchedEffect(key1 = recyclerState) {
                 recyclerState.currentPageIndex.collect {
-                    if (it.second && it.first != currentTrack)
-                        scope.launch {
-                            viewModel.playerInteracts.setCurrentTrack(it.first)
-                        }
+                    if (it.second && it.first != currentTrack) {
+                        viewModel.playerInteracts.setCurrentTrack(it.first)
+                    }
                 }
             }
             LaunchedEffect(key1 = currentTrack, key2 = tracks) {
-                val track = currentTrack ?: return@LaunchedEffect
-                recyclerState.skipToPage(track)
+                if (currentTrack != null)
+                    recyclerState.skipToPage(currentTrack!!)
             }
             RecyclerHorizontalPager(
                 modifier = Modifier
